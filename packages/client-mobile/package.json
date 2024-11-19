@@ -13,6 +13,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@ir-engine/client-core": "^1.6.0",
     "@ir-engine/common": "^1.6.0",
     "@ir-engine/engine": "^1.6.0",
     "@ir-engine/hyperflux": "^1.6.0",
