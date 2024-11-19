@@ -34,6 +34,17 @@ module.exports = makeMetroConfig({
       },
     }),
   },
+  resolver: {
+    resolveRequest: (context, moduleName, platform) => {
+      if (moduleName.startsWith('msgpackr')) {
+        return {
+          filePath: path.resolve(__dirname, '../../node_modules/msgpackr/dist/index.js'),
+          type: 'sourceFile',
+        };
+      }
+      return context.resolveRequest(context, moduleName, platform);
+    }
+  },
   watchFolders: [
     path.resolve(__dirname, '../../node_modules'),
     path.resolve(__dirname, '../../node_modules/client-mobile'),
