@@ -23,27 +23,34 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
-import { XRState } from '../../src/xr/XRState'
+import { XRAnchor, XRAnchorSet } from './XRAnchor';
+import { XRMesh, XRMeshSet } from './XRMesh';
+import { XRPlane, XRPlaneOrientation, XRPlaneSet } from './XRPlane';
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+import { XRHand } from './XRHand';
+import XRHitTestResult from './XRHitTestResult';
+import XRHitTestSource from './XRHitTestSource';
+import { XRJointPose } from './XRJointPose';
+import { XRJointSpace } from './XRJointSpace';
+import XRRay from './XRRay';
+import XRTransientInputHitTestResult from './XRTransientInputHitTestResult';
+import XRTransientInputHitTestSource from './XRTransientInputHitTestSource';
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
-
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
-}
+export default {
+	XRHitTestResult,
+	XRHitTestSource,
+	XRTransientInputHitTestResult,
+	XRTransientInputHitTestSource,
+	XRRay,
+	XRPlane,
+	XRPlaneSet,
+	XRAnchor,
+	XRAnchorSet,
+	XRPlaneOrientation,
+	XRHand,
+	XRJointPose,
+	XRJointSpace,
+	XRMesh,
+	XRMeshSet,
+};

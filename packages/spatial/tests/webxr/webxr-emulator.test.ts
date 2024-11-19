@@ -23,27 +23,32 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { destroyEmulatedXREngine, mockEmulatedXREngine } from '../util/mockEmulatedXREngine'
+import { CustomWebXRPolyfill } from './emulator'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
+import { createEngine, destroyEngine } from '@ir-engine/ecs'
+import { getState } from '@ir-engine/hyperflux'
 import { XRState } from '../../src/xr/XRState'
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+/** @note Runs once on the `describe` implied by vitest for this file */
+beforeAll(() => {
+  new CustomWebXRPolyfill()
+})
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
+describe('WebXR-emulator', () => {
+  beforeEach(async () => {
+    createEngine()
+    await mockEmulatedXREngine()
   })
-  getMutableState(ECSState).timer.set(timer)
 
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
-}
+  afterEach(() => {
+    destroyEmulatedXREngine()
+    destroyEngine()
+  })
+
+  it('should be able to define and initialize a device', async () => {
+    expect(getState(XRState).session).not.toBe(null)
+    expect(getState(XRState).session).not.toBe(undefined)
+  })
+}) //:: WebXR-emulator

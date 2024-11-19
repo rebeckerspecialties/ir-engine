@@ -23,27 +23,24 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
+import { destroySpatialEngine, destroySpatialViewer } from '../../src/initializeEngine'
+import { requestEmulatedXRSession } from '../webxr/emulator'
+import { MockXRFrame } from './MockXR'
+import { mockSpatialEngine } from './mockSpatialEngine'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
+import { getMutableState } from '@ir-engine/hyperflux'
+import { endXRSession } from '../../src/xr/XRSessionFunctions'
 import { XRState } from '../../src/xr/XRState'
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+export async function mockEmulatedXREngine() {
+  mockSpatialEngine()
+  await requestEmulatedXRSession()
+  // @ts-expect-error Allow coercing the MockXRFrame type into the xrFrame property
+  getMutableState(XRState).xrFrame.set(new MockXRFrame())
+}
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
-
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
+export async function destroyEmulatedXREngine() {
+  destroySpatialViewer()
+  destroySpatialEngine()
+  await endXRSession()
 }

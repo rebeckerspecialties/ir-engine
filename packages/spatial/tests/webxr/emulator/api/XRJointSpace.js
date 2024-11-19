@@ -23,27 +23,21 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
-import { XRState } from '../../src/xr/XRState'
+import XRSpace from 'webxr-polyfill/src/api/XRSpace';
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+export const PRIVATE = Symbol('@@webxr-polyfill/XRJointSpace');
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
+export class XRJointSpace extends XRSpace {
+	constructor(jointName, xrhand) {
+		super();
+		this[PRIVATE] = {
+			jointName,
+			xrhand,
+		};
+	}
 
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
+	get jointName() {
+		return this[PRIVATE].jointName;
+	}
 }

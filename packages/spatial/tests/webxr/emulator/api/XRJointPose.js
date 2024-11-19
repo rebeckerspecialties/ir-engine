@@ -23,27 +23,20 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
-import { XRState } from '../../src/xr/XRState'
+import XRPose from 'webxr-polyfill/src/api/XRPose';
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+export const PRIVATE = Symbol('@@webxr-polyfill/XRJointPose');
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
+export class XRJointPose extends XRPose {
+	constructor(transform, radius) {
+		super(transform);
+		this[PRIVATE] = {
+			radius,
+		};
+	}
 
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
+	get radius() {
+		return this[PRIVATE].radius;
+	}
 }

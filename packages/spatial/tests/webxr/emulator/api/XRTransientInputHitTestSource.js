@@ -23,27 +23,45 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
-import { XRState } from '../../src/xr/XRState'
+export const PRIVATE = Symbol('@@webxr-polyfill/XRTransientInputHitTestSource');
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+import XRRay from './XRRay';
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
+export default class XRTransientInputHitTestSource {
+	constructor(session, options) {
+		// @TODO: Support options.entityTypes and options.offsetRay
+		if (options.entityTypes && options.entityTypes.length > 0) {
+			throw new Error(
+				'XRHitTestSource does not support entityTypes option yet.',
+			);
+		}
+		this[PRIVATE] = {
+			session,
+			profile: options.profile,
+			offsetRay: options.offsetRay || new XRRay(),
+			active: true,
+		};
+	}
 
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
+	cancel() {
+		// @TODO: Throw InvalidStateError if active is already false
+		this[PRIVATE].active = false;
+	}
+
+	get _profile() {
+		return this[PRIVATE].profile;
+	}
+
+	get _session() {
+		return this[PRIVATE].session;
+	}
+
+	get _offsetRay() {
+		return this[PRIVATE].offsetRay;
+	}
+
+	get _active() {
+		return this[PRIVATE].active;
+	}
 }

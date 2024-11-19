@@ -23,27 +23,40 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { initializeSpatialEngine, initializeSpatialViewer } from '../../src/initializeEngine'
-import { mockEngineRenderer } from './MockEngineRenderer'
 
-import { ECSState, Timer, setComponent } from '@ir-engine/ecs'
-import { getMutableState, getState } from '@ir-engine/hyperflux'
-import { EngineState } from '../../src/EngineState'
-import { RendererComponent } from '../../src/renderer/WebGLRendererSystem'
-import { XRState } from '../../src/xr/XRState'
+export const PRIVATE = Symbol('@@webxr-polyfill/XRHitTestResult');
 
-export const mockSpatialEngine = () => {
-  initializeSpatialEngine()
-  initializeSpatialViewer()
+import { XRAnchor } from './XRAnchor';
+import { PRIVATE as XRFRAME_PRIVATE } from 'webxr-polyfill/src/api/XRFrame';
+import XRSpace from 'webxr-polyfill/src/api/XRSpace';
+import { mat4 } from 'gl-matrix';
 
-  const timer = Timer((time, xrFrame) => {
-    getMutableState(XRState).xrFrame.set(xrFrame)
-    // executeSystems(time)
-    getMutableState(XRState).xrFrame.set(null)
-  })
-  getMutableState(ECSState).timer.set(timer)
+export default class XRHitTestResult {
+	constructor(frame, transform) {
+		this[PRIVATE] = {
+			frame,
+			transform,
+		};
+	}
 
-  const { originEntity, localFloorEntity, viewerEntity } = getState(EngineState)
-  mockEngineRenderer(viewerEntity)
-  setComponent(viewerEntity, RendererComponent, { scenes: [originEntity, localFloorEntity, viewerEntity] })
+	getPose(baseSpace) {
+		const space = new XRSpace();
+		space._baseMatrix = mat4.copy(
+			mat4.create(),
+			this[PRIVATE].transform.matrix,
+		);
+		return this[PRIVATE].frame.getPose(space, baseSpace);
+	}
+
+	async createAnchor() {
+		const anchorSpace = new XRSpace();
+		anchorSpace._baseMatrix = mat4.copy(
+			mat4.create(),
+			this[PRIVATE].transform.matrix,
+		);
+		const session = this[PRIVATE].frame[XRFRAME_PRIVATE].session;
+		const anchor = new XRAnchor(session, anchorSpace);
+		session.addTrackedAnchor(anchor);
+		return anchor;
+	}
 }
