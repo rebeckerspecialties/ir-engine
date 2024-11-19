@@ -26,5 +26,5 @@ Infinite Reality Engine. All Rights Reserved.
 import { loadConfigForProject } from './loadConfigForProject'
 
 export const loadEngineInjection = async () => {
-  return Promise.all([loadConfigForProject('default-project')])
+  return Promise.all([loadConfigForProject('ir-tutorial-hello')])
 }
