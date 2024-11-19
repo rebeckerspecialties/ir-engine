@@ -23,24 +23,20 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { Text, View } from 'react-native'
-import { useEngineInjection } from '../components/World/EngineHooks'
+import { ProjectConfigInterface } from '@ir-engine/projects/ProjectConfigInterface'
 
-const LocationRoutes = () => {
-  const projectsLoaded = useEngineInjection()
+const configs = {} as Record<string, ProjectConfigInterface>
 
-  if (!projectsLoaded) {
-    return (
-      <View>
-        <Text>Loading Project</Text>
-      </View>
-    )
+export const loadConfigForProject = async (project: string): Promise<ProjectConfigInterface | null> => {
+  try {
+    if (configs[project]) return configs[project]
+    // const [orgname, projectName] = project.split('/')
+    const projectConfig = (await require(`../../../projects/default-project/xrengine.config`))
+      .default as ProjectConfigInterface
+    configs[project] = projectConfig
+    return projectConfig
+  } catch (e) {
+    console.log(`Failed to import config for project ${project} with reason ${e}`)
+    return null!
   }
-  return (
-    <View>
-      <Text>Loaded Project</Text>
-    </View>
-  )
 }
-
-export default LocationRoutes

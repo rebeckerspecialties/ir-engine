@@ -23,24 +23,8 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { Text, View } from 'react-native'
-import { useEngineInjection } from '../components/World/EngineHooks'
+import { loadConfigForProject } from './loadConfigForProject'
 
-const LocationRoutes = () => {
-  const projectsLoaded = useEngineInjection()
-
-  if (!projectsLoaded) {
-    return (
-      <View>
-        <Text>Loading Project</Text>
-      </View>
-    )
-  }
-  return (
-    <View>
-      <Text>Loaded Project</Text>
-    </View>
-  )
+export const loadEngineInjection = async () => {
+  return Promise.all([loadConfigForProject('default-project')])
 }
-
-export default LocationRoutes
