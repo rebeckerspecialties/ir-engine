@@ -12,7 +12,7 @@
     "start": "react-native start",
     "test": "jest"
   },
-  "resolutions": {
+  "overrides": {
     "@types/react": "18.2.0",
     "react": "18.2.0"
   },
@@ -44,7 +44,7 @@
     "@react-native/metro-config": "0.76.2",
     "@react-native/typescript-config": "0.76.2",
     "@rnx-kit/metro-config": "^2.0.0",
-    "@types/react": "^18.2.6",
+    "@types/react": "18.2.0",
     "@types/react-test-renderer": "^18.0.0",
     "@types/webgl2": "^0.0.11",
     "babel-jest": "^29.6.3",
