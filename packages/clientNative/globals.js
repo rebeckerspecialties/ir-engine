@@ -25,5 +25,7 @@ Infinite Reality Engine. All Rights Reserved.
 
 import 'react-native-get-random-values';
 import {TextEncoder, TextDecoder} from 'text-encoding-shim';
+import structuredClone from '@ungap/structured-clone';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
+global.structuredClone = structuredClone;

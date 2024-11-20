@@ -24,6 +24,7 @@
     "@ir-engine/engine": "^1.6.0",
     "@ir-engine/hyperflux": "^1.6.0",
     "@ir-engine/ui": "^1.6.0",
+    "@ungap/structured-clone": "^1.2.0",
     "expo": "^52.0.0",
     "expo-gl": "^15.0.2",
     "expo-modules-core": "^2.0.4",
