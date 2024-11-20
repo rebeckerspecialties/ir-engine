@@ -29,10 +29,16 @@ import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
 import {useCallback, useState} from 'react';
 import {Text, View} from 'react-native';
 
+// TODO: Fix type exported by WebGL
+type ExpoWebGLRenderingContext2 = ExpoWebGLRenderingContext & {
+  drawingBufferWidth: number;
+  drawingBufferHeight: number;
+};
+
 const LocationRoutes = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
-  const onContextCreate = useCallback((context: ExpoWebGLRenderingContext) => {
+  const onContextCreate = useCallback((context: ExpoWebGLRenderingContext2) => {
     const glCanvas = {
       width: context.drawingBufferWidth,
       height: context.drawingBufferHeight,
