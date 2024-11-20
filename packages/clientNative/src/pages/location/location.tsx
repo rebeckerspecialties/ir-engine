@@ -25,9 +25,17 @@ Infinite Reality Engine. All Rights Reserved.
 
 import {useEngineInjection} from '@ir-engine/client-core-mobile/src/components/World/EngineHooks';
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
+import {createEngine} from '@ir-engine/ecs';
+import {createHyperStore} from '@ir-engine/hyperflux';
+import {
+  destroySpatialEngine,
+  initializeSpatialEngine,
+} from '@ir-engine/spatial/src/initializeEngine';
 import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
-import {useCallback, useState} from 'react';
+import {useCallback, useState, useEffect} from 'react';
 import {Text, View} from 'react-native';
+
+createEngine(createHyperStore());
 
 // TODO: Fix type exported by WebGL
 type ExpoWebGLRenderingContext2 = ExpoWebGLRenderingContext & {
@@ -56,10 +64,16 @@ const LocationRoutes = () => {
     setCanvas(glCanvas);
   }, []);
 
-  const projectsLoaded = useEngineInjection();
+  useEffect(() => {
+    initializeSpatialEngine();
+    return () => {
+      destroySpatialEngine();
+    };
+  }, []);
 
-  // TODO: load the engine once modules are polyfilled
-  // useEngineCanvas(canvas)
+  useEngineCanvas(canvas);
+
+  const projectsLoaded = useEngineInjection();
 
   if (!projectsLoaded) {
     return (
