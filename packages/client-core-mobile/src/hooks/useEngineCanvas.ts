@@ -26,10 +26,11 @@ Infinite Reality Engine. All Rights Reserved.
 import { getOptionalMutableComponent, hasComponent } from '@ir-engine/ecs'
 import { none, useMutableState } from '@ir-engine/hyperflux'
 import { EngineState } from '@ir-engine/spatial/src/EngineState'
+import { destroySpatialViewer, initializeSpatialViewer } from '@ir-engine/spatial/src/initializeEngine'
 import { RendererComponent } from '@ir-engine/spatial/src/renderer/WebGLRendererSystem'
 import { useEffect } from 'react'
 
-export const useEngineCanvas = (ref: React.RefObject<HTMLElement>) => {
+export const useEngineCanvas = (canvas: HTMLCanvasElement | null) => {
   // const lastRef = useHookstate(() => ref.current)
 
   // useEffect(() => {
@@ -64,15 +65,14 @@ export const useEngineCanvas = (ref: React.RefObject<HTMLElement>) => {
   //   }
   // }, [lastRef.value])
 
-  // /** Essentially mount/unmount upon the attach/detatch state of the ref node */
-  // useEffect(() => {
-  //   if (!lastRef.value) return
-  //   const canvas = document.getElementById('engine-renderer-canvas') as HTMLCanvasElement
-  //   initializeSpatialViewer(canvas)
-  //   return () => {
-  //     destroySpatialViewer()
-  //   }
-  // }, [!!lastRef.value])
+  /** Essentially mount/unmount upon the attach/detatch state of the ref node */
+  useEffect(() => {
+    if (!canvas) return
+    initializeSpatialViewer(canvas)
+    return () => {
+      destroySpatialViewer()
+    }
+  }, [!!canvas])
 
   /**
    * Since the viewer and XR reference spaces can technically exist without the other,

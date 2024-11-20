@@ -24,10 +24,34 @@ Infinite Reality Engine. All Rights Reserved.
 */
 
 import { useEngineInjection } from '@ir-engine/client-core-mobile/src/components/World/EngineHooks'
+import { useEngineCanvas } from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas'
+import { ExpoWebGLRenderingContext, GLView } from 'expo-gl'
+import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
 const LocationRoutes = () => {
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
+
+  const onContextCreate = useCallback((context: ExpoWebGLRenderingContext) => {
+    const glCanvas = {
+      width: context.drawingBufferWidth,
+      height: context.drawingBufferHeight,
+      style: {},
+      addEventListener: (() => {}) as any,
+      removeEventListener: (() => {}) as any,
+      clientHeight: context.drawingBufferHeight,
+      getContext: (glContext: 'webgl2') => {
+        if (glContext === 'webgl2') {
+          return context
+        }
+        throw new Error(`Unsupported context: ${glContext}`)
+      }
+    } as HTMLCanvasElement
+    setCanvas(glCanvas)
+  }, [])
+
   const projectsLoaded = useEngineInjection()
+  useEngineCanvas(canvas)
 
   if (!projectsLoaded) {
     return (
@@ -38,6 +62,7 @@ const LocationRoutes = () => {
   }
   return (
     <View>
+      <GLView style={{ flex: 1 }} onContextCreate={onContextCreate} />
       <Text>Loaded Project</Text>
     </View>
   )
