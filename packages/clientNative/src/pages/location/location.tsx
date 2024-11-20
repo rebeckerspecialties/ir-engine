@@ -62,8 +62,11 @@ const LocationRoutes = () => {
   }
   return (
     <View>
-      <GLView style={{flex: 1}} onContextCreate={onContextCreate} />
       <Text>Loaded Project</Text>
+      <GLView
+        style={{width: 300, height: 300}}
+        onContextCreate={onContextCreate}
+      />
     </View>
   );
 };
