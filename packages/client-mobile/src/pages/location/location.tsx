@@ -24,7 +24,7 @@ Infinite Reality Engine. All Rights Reserved.
 */
 
 import { Text, View } from 'react-native'
-import { useEngineInjection } from '../components/World/EngineHooks'
+import { useEngineInjection } from '../../components/World/EngineHooks'
 
 const LocationRoutes = () => {
   const projectsLoaded = useEngineInjection()

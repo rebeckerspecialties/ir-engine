@@ -32,7 +32,7 @@ Infinite Reality Engine. All Rights Reserved.
 
 import React from 'react'
 import { SafeAreaView, View } from 'react-native'
-import LocationRoutes from './src/pages/location'
+import LocationRoutes from './src/pages/location/location'
 
 function App(): React.JSX.Element {
   return (
