@@ -28,7 +28,8 @@
     "expo-gl": "^15.0.2",
     "expo-modules-core": "^2.0.4",
     "react": "18.2.0",
-    "react-native": "0.76.2"
+    "react-native": "0.76.2",
+    "text-encoding-shim": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

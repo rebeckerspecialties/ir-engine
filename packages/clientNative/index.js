@@ -27,6 +27,7 @@ Infinite Reality Engine. All Rights Reserved.
  * @format
  */
 
+import './globals';
 import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
