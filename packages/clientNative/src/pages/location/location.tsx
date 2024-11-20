@@ -51,6 +51,8 @@ const LocationRoutes = () => {
   }, []);
 
   const projectsLoaded = useEngineInjection();
+
+  // TODO: load the engine once modules are polyfilled
   // useEngineCanvas(canvas)
 
   if (!projectsLoaded) {
