@@ -42,6 +42,12 @@ module.exports = makeMetroConfig({
           type: 'sourceFile',
         };
       }
+      if (moduleName.startsWith('draco3dgltf')) {
+        return {
+          filePath: path.resolve(__dirname, '../../node_modules/@callstack/react-native-draco/lib/commonjs/index.js'),
+          type: 'sourceFile',
+        }
+      }
       return context.resolveRequest(context, moduleName, platform);
     }
   },
@@ -50,8 +56,6 @@ module.exports = makeMetroConfig({
     path.resolve(__dirname, '../../node_modules/client-mobile'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/hyperflux'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/projects'),
-    // path.resolve(__dirname, '../../node_modules/@ir-engine/client'),
-    // path.resolve(__dirname, '../../node_modules/@ir-engine/client-core'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/common'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/ecs'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/engine'),
