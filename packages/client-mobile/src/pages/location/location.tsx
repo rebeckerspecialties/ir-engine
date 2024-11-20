@@ -23,8 +23,8 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
+import { useEngineInjection } from '@ir-engine/client-core-mobile/src/components/World/EngineHooks'
 import { Text, View } from 'react-native'
-import { useEngineInjection } from '../../components/World/EngineHooks'
 
 const LocationRoutes = () => {
   const projectsLoaded = useEngineInjection()

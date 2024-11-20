@@ -54,6 +54,8 @@ module.exports = makeMetroConfig({
   watchFolders: [
     path.resolve(__dirname, '../../node_modules'),
     path.resolve(__dirname, '../../node_modules/client-mobile'),
+    path.resolve(__dirname, '../../node_modules/@ir-engine/client-core-mobile'),
+    path.resolve(__dirname, '../../node_modules/@ir-engine/projects-mobile'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/hyperflux'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/projects'),
     path.resolve(__dirname, '../../node_modules/@ir-engine/common'),

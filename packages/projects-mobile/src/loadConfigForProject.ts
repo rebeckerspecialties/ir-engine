@@ -31,7 +31,7 @@ export const loadConfigForProject = async (project: string): Promise<ProjectConf
   try {
     if (configs[project]) return configs[project]
     // const [orgname, projectName] = project.split('/')
-    const projectConfig = (await require(`../../../projects/ir-tutorial-hello/xrengine.config`))
+    const projectConfig = (await require(`../../projects/ir-tutorial-hello/xrengine.config`))
       .default as ProjectConfigInterface
     configs[project] = projectConfig
     return projectConfig
