@@ -23,13 +23,35 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-/**
- * @format
- */
+import {ExpoWebGLRenderingContext} from 'expo-gl';
 
-import './globals';
-import {AppRegistry} from 'react-native';
-import App from './App';
-import {name as appName} from './app.json';
+export type NativeWebGLRenderingContext = ExpoWebGLRenderingContext & {
+  drawingBufferWidth: number;
+  drawingBufferHeight: number;
+};
 
-AppRegistry.registerComponent(appName, () => App);
+export class NativeHTMLCanvasElement implements HTMLCanvasElement {
+  public width: number;
+  public height: number;
+  public style: Record<string, string>;
+  public addEventListener = () => {};
+  public removeEventListener = () => {};
+  public clientHeight: number;
+
+  private context: NativeWebGLRenderingContext;
+
+  constructor(context: NativeWebGLRenderingContext) {
+    this.width = context.drawingBufferWidth;
+    this.height = context.drawingBufferHeight;
+    this.style = {};
+    this.clientHeight = context.drawingBufferHeight;
+    this.context = context;
+  }
+
+  public getContext(glContext: 'webgl2') {
+    if (glContext === 'webgl2') {
+      return this.context;
+    }
+    throw new Error(`Unsupported context: ${glContext}`);
+  }
+}
