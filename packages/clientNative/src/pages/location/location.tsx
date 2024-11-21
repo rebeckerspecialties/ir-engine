@@ -39,6 +39,7 @@ import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
 } from '../../polyfill/NativeHTMLCanvasElement';
+import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
 
 createEngine(createHyperStore());
 startTimer();
@@ -74,6 +75,11 @@ const LocationRoutes = () => {
   return (
     <View>
       <Text>Loaded Project</Text>
+      <LocationPage
+        params={{
+          locationName: 'ir-tutorial-hello',
+        }}
+      />
       <GLView
         style={{width: 300, height: 300}}
         onContextCreate={onContextCreate}
