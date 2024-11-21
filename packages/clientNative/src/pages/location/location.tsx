@@ -38,7 +38,7 @@ import {Text, View} from 'react-native';
 import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
-} from './NativeHTMLCanvasElement';
+} from '../../polyfill/NativeHTMLCanvasElement';
 
 createEngine(createHyperStore());
 startTimer();
