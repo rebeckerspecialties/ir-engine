@@ -44,3 +44,5 @@ global.localStorage = {
     return (this._data = {});
   },
 };
+window.addEventListener = () => {};
+window.removeEventListener = () => {};
