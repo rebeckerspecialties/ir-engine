@@ -24,11 +24,14 @@
     "@ir-engine/engine": "^1.6.0",
     "@ir-engine/hyperflux": "^1.6.0",
     "@ir-engine/ui": "^1.6.0",
+    "@ungap/structured-clone": "^1.2.0",
     "expo": "^52.0.0",
     "expo-gl": "^15.0.2",
     "expo-modules-core": "^2.0.4",
     "react": "18.2.0",
-    "react-native": "0.76.2"
+    "react-native": "0.76.2",
+    "react-native-get-random-values": "^1.11.0",
+    "text-encoding-shim": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

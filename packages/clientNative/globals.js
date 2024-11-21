@@ -23,13 +23,26 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-/**
- * @format
- */
-
-import './globals';
-import {AppRegistry} from 'react-native';
-import App from './App';
-import {name as appName} from './app.json';
-
-AppRegistry.registerComponent(appName, () => App);
+import 'react-native-get-random-values';
+import {TextEncoder, TextDecoder} from 'text-encoding-shim';
+import structuredClone from '@ungap/structured-clone';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+global.structuredClone = structuredClone;
+global.localStorage = {
+  _data: {},
+  setItem: function (id, val) {
+    return (this._data[id] = String(val));
+  },
+  getItem: function (id) {
+    return this._data.hasOwnProperty(id) ? this._data[id] : null;
+  },
+  removeItem: function (id) {
+    return delete this._data[id];
+  },
+  clear: function () {
+    return (this._data = {});
+  },
+};
+window.addEventListener = () => {};
+window.removeEventListener = () => {};
