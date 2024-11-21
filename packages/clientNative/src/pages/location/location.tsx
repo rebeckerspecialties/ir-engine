@@ -27,42 +27,31 @@ import {useEngineInjection} from '@ir-engine/client-core-mobile/src/components/W
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
 import {createEngine} from '@ir-engine/ecs';
 import {createHyperStore} from '@ir-engine/hyperflux';
+import {startTimer} from '@ir-engine/spatial/src/startTimer';
 import {
   destroySpatialEngine,
   initializeSpatialEngine,
 } from '@ir-engine/spatial/src/initializeEngine';
-import {ExpoWebGLRenderingContext, GLView} from 'expo-gl';
+import {GLView} from 'expo-gl';
 import {useCallback, useState, useEffect} from 'react';
 import {Text, View} from 'react-native';
+import {
+  NativeHTMLCanvasElement,
+  NativeWebGLRenderingContext,
+} from './NativeHTMLCanvasElement';
 
 createEngine(createHyperStore());
-
-// TODO: Fix type exported by WebGL
-type ExpoWebGLRenderingContext2 = ExpoWebGLRenderingContext & {
-  drawingBufferWidth: number;
-  drawingBufferHeight: number;
-};
+startTimer();
 
 const LocationRoutes = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
-  const onContextCreate = useCallback((context: ExpoWebGLRenderingContext2) => {
-    const glCanvas = {
-      width: context.drawingBufferWidth,
-      height: context.drawingBufferHeight,
-      style: {},
-      addEventListener: (() => {}) as any,
-      removeEventListener: (() => {}) as any,
-      clientHeight: context.drawingBufferHeight,
-      getContext: (glContext: 'webgl2') => {
-        if (glContext === 'webgl2') {
-          return context;
-        }
-        throw new Error(`Unsupported context: ${glContext}`);
-      },
-    } as HTMLCanvasElement;
-    setCanvas(glCanvas);
-  }, []);
+  const onContextCreate = useCallback(
+    (context: NativeWebGLRenderingContext) => {
+      setCanvas(new NativeHTMLCanvasElement(context));
+    },
+    [],
+  );
 
   useEffect(() => {
     initializeSpatialEngine();
