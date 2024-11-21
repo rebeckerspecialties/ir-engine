@@ -25,11 +25,11 @@ Infinite Reality Engine. All Rights Reserved.
 
 import { useLoadLocation, useLoadScene } from '@ir-engine/client-core-mobile/src/components/World/LoadLocationScene'
 
-import '@ir-engine/client-core/src/util/GlobalStyle.css'
+// import '@ir-engine/client-core/src/util/GlobalStyle.css'
 
-import './LocationModule'
+// import './LocationModule'
 
-import { useLoadEngineWithScene, useNetwork } from '../components/World/EngineHooks'
+import { useLoadEngineWithScene } from '../components/World/EngineHooks'
 
 // const logger = multiLogger.child({ component: 'system:location', modifier: clientContextParams })
 
@@ -47,7 +47,7 @@ const LocationPage = ({ online, params }: Props) => {
   // const params = useParams()
   // const ready = useMutableState(LoadingUISystemState).ready
 
-  useNetwork({ online })
+  // useNetwork({ online })
 
   if (params.locationName) {
     useLoadLocation({ locationName: params.locationName })
