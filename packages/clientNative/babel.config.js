@@ -23,6 +23,41 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
+const path = require('path');
+const rootDir = path.resolve(__dirname, '../..');
+
+// List of all packages used by Client Native.
+const packages = [
+  'client-core-mobile',
+  'hyperflux',
+  'projects',
+  'projects-mobile',
+  'common',
+  'ecs',
+  'engine',
+  'network',
+  'spatial',
+  'ui',
+  'xrui'
+];
+
+const generateAliases = () => {
+  // Generate aliases for all packages
+  return packages.reduce((aliases, pkg) => ({
+    ...aliases,
+    [`@ir-engine/${pkg}/*`]: path.resolve(rootDir, `packages/${pkg}/src/*`)
+  }), {});
+};
+
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
+  plugins: [
+    [
+      'module-resolver',
+      {
+        extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+        alias: generateAliases()
+      },
+    ],
+  ],
 };
