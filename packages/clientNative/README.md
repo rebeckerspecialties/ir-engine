@@ -68,3 +68,5 @@ To learn more about React Native, take a look at the following resources:
 ```
 npx metro-symbolicate main.jsbundle.map < stacktrace.txt
 ```
+
+Source: https://reactnative.dev/docs/debugging-release-builds
