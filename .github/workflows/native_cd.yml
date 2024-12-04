@@ -76,7 +76,7 @@ jobs:
           xcodebuild -scheme "clientNative" \
           -archivePath "clientNative.xcarchive" \
           -workspace ios/clientNative.xcworkspace \
-          -configuration Debug \
+          -configuration Release \
           -sdk iphoneos \
           -destination generic/platform=iOS \
           -allowProvisioningUpdates \
