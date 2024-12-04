@@ -25,11 +25,13 @@ Infinite Reality Engine. All Rights Reserved.
 
 import { useEffect } from 'react'
 
-import { LocationService, LocationState } from '@ir-engine/client-core-mobile/src/social/services/LocationService'
+import { LocationService, LocationState } from '@ir-engine/client-core/src/social/services/LocationService'
 import { useGet } from '@ir-engine/common'
 import { staticResourcePath } from '@ir-engine/common/src/schema.type.module'
 import { GLTFAssetState } from '@ir-engine/engine/src/gltf/GLTFState'
 import { getMutableState, getState, useMutableState } from '@ir-engine/hyperflux'
+
+import { ClientContextState } from '@ir-engine/client-core/src/util/ClientContextState'
 
 import { DomainConfigState } from '@ir-engine/engine/src/assets/state/DomainConfigState'
 
@@ -37,25 +39,19 @@ export const useLoadLocation = (props: { locationName: string }) => {
   const locationState = useMutableState(LocationState)
   const scene = useGet(staticResourcePath, locationState.currentLocation.location.sceneId.value).data
 
-  // ClientContextState.useValue('location_id', locationState.currentLocation.location.id.value)
-  // ClientContextState.useValue('project_id', locationState.currentLocation.location.projectId.value)
+  ClientContextState.useValue('location_id', locationState.currentLocation.location.id.value)
+  ClientContextState.useValue('project_id', locationState.currentLocation.location.projectId.value)
 
   useEffect(() => {
     LocationState.setLocationName(props.locationName)
     if (locationState.locationName.value) LocationService.getLocationByName(locationState.locationName.value)
   }, [])
 
-  // useEffect(() => {
-  //   if (locationState.invalidLocation.value) {
-  //     WarningUIService.openWarning({
-  //       title: t('common:instanceServer.invalidLocation'),
-  //       body: `${t('common:instanceServer.cantFindLocation')} '${locationState.locationName.value}'. ${t(
-  //         'common:instanceServer.misspelledOrNotExist'
-  //       )}`,
-  //       action: () => RouterState.navigate('/')
-  //     })
-  //   }
-  // }, [locationState.invalidLocation])
+  useEffect(() => {
+    if (locationState.invalidLocation.value) {
+      alert('Invalid location')
+    }
+  }, [locationState.invalidLocation])
 
   // useEffect(() => {
   //   if (locationState.currentLocation.selfNotAuthorized.value) {

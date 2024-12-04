@@ -48,10 +48,10 @@ export class API {
   static instance: API
   client: FeathersApplication<ServiceTypes>
 
-  static createAPI = () => {
+  static createAPI = (pathName: string = window?.location?.pathname || '') => {
     const feathersClient = feathers()
 
-    const primus = new Primus(`${config.client.serverUrl}?pathName=${window.location.pathname}`, {
+    const primus = new Primus(`${config.client.serverUrl}?pathName=${pathName}`, {
       withCredentials: true,
       pingTimeout: config.websocket.pingTimeout,
       pingInterval: config.websocket.pingInterval

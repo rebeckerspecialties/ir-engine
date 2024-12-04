@@ -23,21 +23,45 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { loadConfigForProject } from './loadConfigForProject'
+import { CompressedTexture, CompressedTextureLoader, LoadingManager, WebGLRenderer } from 'three'
 
-export const loadEngineInjection = async () => {
-  // const projects = await API.instance.service(projectsPath).find()
-  const projects = ['ir-engine/default-project']
-  return Promise.all(
-    projects.map(async (project) => {
-      try {
-        const projectConfig = (await loadConfigForProject(project))!
-        if (typeof projectConfig.worldInjection !== 'function') return null!
-        return (await projectConfig.worldInjection()).default?.()
-      } catch (e) {
-        console.error(`Failed to import world load event for project ${project} with reason ${e}`)
-        return null!
-      }
-    })
-  )
+export class KTX2Loader extends CompressedTextureLoader {
+  constructor(manager?: LoadingManager) {
+    super(manager)
+    console.warn('NATIVE KTX2 LOADER IS INITIALIZED')
+    return this
+  }
+
+  setTranscoderPath(path: string): KTX2Loader {
+    return this
+  }
+  setWorkerLimit(limit: number): KTX2Loader {
+    return this
+  }
+  detectSupport(renderer: WebGLRenderer | null): KTX2Loader {
+    return this
+  }
+  dispose(): KTX2Loader {
+    return this
+  }
+
+  parse(
+    buffer: ArrayBuffer,
+    onLoad: (texture: CompressedTexture) => void,
+    onError?: (event: ErrorEvent) => void
+  ): KTX2Loader {
+    debugger
+    return this
+  }
+
+  load(
+    url: string,
+    onLoad: (texture: CompressedTexture) => void,
+    onProgress?: (requrest: ProgressEvent<EventTarget>) => void | undefined,
+    onError?: ((event: ErrorEvent) => void) | undefined,
+    signal?: AbortSignal
+  ): CompressedTexture {
+    debugger
+    return null
+  }
 }

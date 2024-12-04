@@ -169,7 +169,7 @@ const server = {
     ? parseInt(process.env.INSTANCESERVER_UNREACHABLE_TIMEOUT_SECONDS)
     : 10
 }
-const obj = kubernetesEnabled ? { protocol: 'https', hostname: server.hostname } : { protocol: 'https', ...server }
+const obj = kubernetesEnabled ? { protocol: 'http', hostname: server.hostname } : { protocol: 'http', ...server }
 server.url = process.env.SERVER_URL || url.format(obj)
 
 /**
@@ -180,14 +180,14 @@ const client = {
   title: process.env.APP_TITLE!,
   get dist() {
     if (process.env.SERVE_CLIENT_FROM_STORAGE_PROVIDER === 'true' && process.env.STORAGE_PROVIDER === 'local')
-      return `https://${process.env.LOCAL_STORAGE_PROVIDER}/client/`
+      return `http://${process.env.LOCAL_STORAGE_PROVIDER}/client/`
     return client.url
   },
   url:
     process.env.APP_URL ||
     (process.env.VITE_LOCAL_BUILD
       ? 'http://' + process.env.APP_HOST + ':' + process.env.APP_PORT
-      : 'https://' + process.env.APP_HOST + ':' + process.env.APP_PORT),
+      : 'http://' + process.env.APP_HOST + ':' + process.env.APP_PORT),
   port: process.env.APP_PORT || '3000',
   releaseName: process.env.RELEASE_NAME || 'local'
 }
@@ -295,7 +295,7 @@ const authentication = {
         server.hostname !== '127.0.0.1' && server.hostname !== 'localhost'
           ? server.hostname
           : server.hostname + ':' + server.port,
-      protocol: 'https'
+      protocol: 'http'
     },
     apple: {
       key: process.env.APPLE_CLIENT_ID!,
@@ -454,7 +454,7 @@ const config = {
     serviceHost: process.env.KUBERNETES_SERVICE_HOST!,
     tcpPort: process.env.KUBERNETES_PORT_443_TCP_PORT!
   },
-  noSSL: process.env.NOSSL === 'true',
+  noSSL: true,
   localBuild: process.env.VITE_LOCAL_BUILD === 'true',
   testEnabled,
   /** @todo when project versioning is fully implemented, remove 'undefined' check here */

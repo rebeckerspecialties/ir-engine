@@ -23,15 +23,15 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { useLoadLocation, useLoadScene } from '@ir-engine/client-core-mobile/src/components/World/LoadLocationScene'
+import { useLoadLocation } from '@ir-engine/client-core-mobile/src/components/World/LoadLocationScene'
 
-// import '@ir-engine/client-core/src/util/GlobalStyle.css'
+import { AuthService } from '@ir-engine/client-core/src/user/services/AuthService'
+import multiLogger from '@ir-engine/common/src/logger'
+import { useLoadScene } from '../components/World/LoadLocationScene'
 
-// import './LocationModule'
+import { clientContextParams } from '@ir-engine/client-core/src/util/ClientContextState'
 
-import { useLoadEngineWithScene } from '../components/World/EngineHooks'
-
-// const logger = multiLogger.child({ component: 'system:location', modifier: clientContextParams })
+const logger = multiLogger.child({ component: 'system:location', modifier: clientContextParams })
 
 type Props = {
   online?: boolean
@@ -44,50 +44,28 @@ type Props = {
 
 const LocationPage = ({ online, params }: Props) => {
   // const { t } = useTranslation()
-  // const params = useParams()
   // const ready = useMutableState(LoadingUISystemState).ready
 
   // useNetwork({ online })
 
   if (params.locationName) {
-    useLoadLocation({ locationName: params.locationName })
+    useLoadLocation({ locationName: params.locationName! })
   } else {
     useLoadScene({ projectName: params.projectName!, sceneName: params.sceneName! })
   }
 
-  // AuthService.useAPIListeners()
+  AuthService.useAPIListeners()
   // LocationService.useLocationBanListeners()
-
-  useLoadEngineWithScene()
 
   // useEffect(() => {
   //   if (!ready.value) return
   //   logger.info({ event_name: 'enter_location' })
   //   return () => logger.info({ event_name: 'exit_location' })
   // }, [ready.value])
-
-  // To show invalid token error
-  // useEffect(() => {
-  //   const queryParams = new URLSearchParams(location.search)
-  //   if (queryParams.has('error')) {
-  //     NotificationService.dispatchNotify(t('common:error.expiredToken'), {
-  //       variant: 'error'
-  //     })
-  //   }
-  // }, [location.search])
-
-  // return (
-  //   <>
-  //     <ThemeContextProvider>
-  //       <StyledEngineProvider injectFirst>
-  //         {!ready.value && (
-  //           <LoadingView fullScreen className="block h-12 w-12" title={t('common:loader.loadingEngine')} />
-  //         )}
-  //         <LocationIcons />
-  //       </StyledEngineProvider>
-  //     </ThemeContextProvider>
-  //   </>
-  // )
+  //
+  // if (!ready.value) {
+  //   return <Text>Loading...</Text>
+  // }
   return null
 }
 

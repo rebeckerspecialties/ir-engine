@@ -219,7 +219,7 @@ export const connectToInstance = (
         (config.client.appEnv === 'development' && config.client.localNginx !== 'true')
       ) {
         const queryString = new URLSearchParams(query).toString()
-        primus = new Primus(`https://${ipAddress as string}:${port.toString()}?${queryString}`, {
+        primus = new Primus(`http://${ipAddress as string}:${port.toString()}?${queryString}`, {
           pingTimeout: config.websocket.pingTimeout,
           pingInterval: config.websocket.pingInterval
         })

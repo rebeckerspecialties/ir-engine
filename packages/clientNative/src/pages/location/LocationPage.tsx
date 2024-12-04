@@ -25,24 +25,19 @@ Infinite Reality Engine. All Rights Reserved.
 
 import {useEngineInjection} from '@ir-engine/client-core-mobile/src/components/World/EngineHooks';
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
-import {createEngine} from '@ir-engine/ecs';
-import {createHyperStore} from '@ir-engine/hyperflux';
-import {startTimer} from '@ir-engine/spatial/src/startTimer';
-import {
-  destroySpatialEngine,
-  initializeSpatialEngine,
-} from '@ir-engine/spatial/src/initializeEngine';
+import {useSpatialEngine} from '@ir-engine/spatial/src/initializeEngine';
 import {GLView} from 'expo-gl';
-import {useCallback, useState, useEffect} from 'react';
-import {Text, View} from 'react-native';
+import {useCallback, useState} from 'react';
+import {Text, View, Dimensions} from 'react-native';
 import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
 } from '../../polyfill/NativeHTMLCanvasElement';
 import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
 
-createEngine(createHyperStore());
-startTimer();
+import '../../engine';
+
+const {width, height} = Dimensions.get('window');
 
 const LocationRoutes = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -54,13 +49,7 @@ const LocationRoutes = () => {
     [],
   );
 
-  useEffect(() => {
-    initializeSpatialEngine();
-    return () => {
-      destroySpatialEngine();
-    };
-  }, []);
-
+  useSpatialEngine();
   useEngineCanvas(canvas);
 
   const projectsLoaded = useEngineInjection();
@@ -68,22 +57,19 @@ const LocationRoutes = () => {
   if (!projectsLoaded) {
     return (
       <View>
-        <Text>Loading Project</Text>
+        <Text>Authenticating...</Text>
       </View>
     );
   }
+
   return (
     <View>
-      <Text>Loaded Project</Text>
       <LocationPage
         params={{
-          locationName: 'ir-tutorial-hello',
+          locationName: 'sky-station',
         }}
       />
-      <GLView
-        style={{width: 300, height: 300}}
-        onContextCreate={onContextCreate}
-      />
+      <GLView style={{width, height}} onContextCreate={onContextCreate} />
     </View>
   );
 };

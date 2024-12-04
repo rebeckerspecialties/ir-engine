@@ -59,5 +59,13 @@ module.exports = {
         alias: generateAliases()
       },
     ],
+    ["module:react-native-dotenv", {
+      "envName": "@env",
+      "moduleName": "@env",
+      "path": "../../.env.local",
+      "safe": false,
+      "allowUndefined": true,
+      "verbose": false
+    }]
   ],
 };

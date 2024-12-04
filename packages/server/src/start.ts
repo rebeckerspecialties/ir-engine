@@ -80,7 +80,7 @@ export const start = async (): Promise<void> => {
   const certPath = config.server.certPath
   const certKeyPath = config.server.keyPath
 
-  const useSSL = !config.noSSL && (config.localBuild || !config.kubernetes.enabled) && fs.existsSync(certKeyPath)
+  const useSSL = false
 
   const certOptions = {
     key: useSSL ? fs.readFileSync(certKeyPath) : null,
@@ -145,7 +145,7 @@ export const start = async (): Promise<void> => {
     })
     clientApp.listen = function () {
       let server
-      const HTTPS = process.env.VITE_LOCAL_BUILD ?? false
+      const HTTPS = false
       if (HTTPS) {
         server = https.createServer(certOptions as any, this.callback())
       } else {

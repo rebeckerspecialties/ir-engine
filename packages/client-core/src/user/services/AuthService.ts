@@ -66,14 +66,14 @@ import {
   syncStateWithLocalStorage,
   useHookstate
 } from '@ir-engine/hyperflux'
-import { MessageResponse, ParentCommunicator } from '../../common/iframeCOM'
-import { NotificationService } from '../../common/services/NotificationService'
+import { MessageResponse } from '../../common/iframeCOM'
+// import { NotificationService } from '../../common/services/NotificationService'
 
 export const logger = multiLogger.child({ component: 'client-core:AuthService' })
 export const TIMEOUT_INTERVAL = 50 // ms per interval of waiting for authToken to be updated
 
-const iframe = document.getElementById('root-cookie-accessor') as HTMLIFrameElement
-const communicator = new ParentCommunicator('root-cookie-accessor', config.client.clientUrl) //Eventually we can configure iframe target seperatly
+// const iframe = document.getElementById('root-cookie-accessor') as HTMLIFrameElement
+// const communicator = new ParentCommunicator('root-cookie-accessor', config.client.clientUrl) //Eventually we can configure iframe target seperatly
 
 export const UserSeed: UserType = {
   id: '' as UserID,
@@ -95,54 +95,56 @@ const invalidDomainHandling = (error: MessageResponse): void => {
 }
 
 const waitForToken = (win: Window, clientUrl: string): Promise<string> => {
-  return communicator
-    .sendMessage('get', {
-      key: `${stateNamespaceKey}.AuthState.authUser`
-    })
-    .then((response) => {
-      if (response.success) {
-        try {
-          const data = JSON.parse(response.data) //this is cookie data(e.data.data) so it's a string
-          if (data?.accessToken != null) {
-            return data?.accessToken
-          }
-          return ''
-        } catch {
-          return '' // Failed to parse token from cookie
-        }
-      } else {
-        return '' // didn't get data but can't guarantee
-      }
-    })
-    .catch((message) => {
-      if (message instanceof SyntaxError) {
-        throw message
-      }
-      invalidDomainHandling(message)
-      return message
-    })
+  // return communicator
+  //   .sendMessage('get', {
+  //     key: `${stateNamespaceKey}.AuthState.authUser`
+  //   })
+  //   .then((response) => {
+  //     if (response.success) {
+  //       try {
+  //         const data = JSON.parse(response.data) //this is cookie data(e.data.data) so it's a string
+  //         if (data?.accessToken != null) {
+  //           return data?.accessToken
+  //         }
+  //         return ''
+  //       } catch {
+  //         return '' // Failed to parse token from cookie
+  //       }
+  //     } else {
+  //       return '' // didn't get data but can't guarantee
+  //     }
+  //   })
+  //   .catch((message) => {
+  //     if (message instanceof SyntaxError) {
+  //       throw message
+  //     }
+  //     invalidDomainHandling(message)
+  //     return message
+  //   })
+  return Promise.resolve('')
 }
 
 const getToken = async (): Promise<string> => {
   let win
-  try {
-    win = iframe!.contentWindow
-  } catch (e) {
-    win = iframe!.contentWindow
-  }
+  // try {
+  //   win = iframe!.contentWindow
+  // } catch (e) {
+  //   win = iframe!.contentWindow
+  // }
 
   const clientUrl = config.client.clientUrl
-  const hasAccess = (await communicator
-    .sendMessage('checkAccess')
-    .then((message) => {
-      if (message?.data?.skipCrossOriginCookieCheck === true || message?.data?.storageAccessPermission === 'denied')
-        localStorage.setItem('skipCrossOriginCookieCheck', 'true')
-      return message.data
-    })
-    .catch((message) => {
-      invalidDomainHandling(message)
-      return {}
-    })) as HasAccessType
+  // const hasAccess = (await communicator
+  //   .sendMessage('checkAccess')
+  //   .then((message) => {
+  //     if (message?.data?.skipCrossOriginCookieCheck === true || message?.data?.storageAccessPermission === 'denied')
+  //       localStorage.setItem('skipCrossOriginCookieCheck', 'true')
+  //     return message.data
+  //   })
+  //   .catch((message) => {
+  //     invalidDomainHandling(message)
+  //     return {}
+  //   })) as HasAccessType
+  const hasAccess = {} as HasAccessType
 
   if (!hasAccess?.cookieSet || !hasAccess?.hasStorageAccess) {
     const skipCheck = localStorage.getItem('skipCrossOriginCookieCheck')
@@ -152,22 +154,22 @@ const getToken = async (): Promise<string> => {
       const accessToken = authState?.authUser?.accessToken?.value
       return Promise.resolve(accessToken?.length > 0 ? accessToken : '')
     } else {
-      iframe.style.display = 'block'
-      iframe.style.visibility = 'visible'
+      // iframe.style.display = 'block'
+      // iframe.style.visibility = 'visible'
       return new Promise((resolve) => {
         const clickResponseListener = async function (e) {
-          if (e.origin !== config.client.clientUrl || e.source !== iframe.contentWindow) return
+          if (e.origin !== config.client.clientUrl) return
           try {
             const data = e?.data?.data
             if (data.skipCrossOriginCookieCheck === true || data.storageAccessPermission === 'denied') {
               localStorage.setItem('skipCrossOriginCookieCheck', 'true')
-              iframe.style.display = 'none'
-              iframe.style.visibility = 'hidden'
+              // iframe.style.display = 'none'
+              // iframe.style.visibility = 'hidden'
               resolve('')
             } else {
               const token = waitForToken(win, clientUrl)
-              iframe.style.display = 'none'
-              iframe.style.visibility = 'hidden'
+              // iframe.style.display = 'none'
+              // iframe.style.visibility = 'hidden'
               resolve(token)
             }
           } catch (err) {
@@ -220,23 +222,22 @@ export interface LinkedInLoginForm {
 }
 
 export const writeAuthUserToIframe = async () => {
-  if (localStorage.getItem('skipCrossOriginCookieCheck') === 'true') return
-  const iframe = document.getElementById('root-cookie-accessor') as HTMLFrameElement
-  let win
-  try {
-    win = iframe!.contentWindow
-  } catch (e) {
-    win = iframe!.contentWindow
-  }
-
-  await communicator
-    .sendMessage('set', {
-      key: `${stateNamespaceKey}.${AuthState.name}.authUser`,
-      data: getState(AuthState).authUser
-    })
-    .catch((message) => {
-      invalidDomainHandling(message)
-    })
+  // if (localStorage.getItem('skipCrossOriginCookieCheck') === 'true') return
+  // const iframe = document.getElementById('root-cookie-accessor') as HTMLFrameElement
+  // let win
+  // try {
+  //   win = iframe!.contentWindow
+  // } catch (e) {
+  //   win = iframe!.contentWindow
+  // }
+  // await communicator
+  //   .sendMessage('set', {
+  //     key: `${stateNamespaceKey}.${AuthState.name}.authUser`,
+  //     data: getState(AuthState).authUser
+  //   })
+  //   .catch((message) => {
+  //     invalidDomainHandling(message)
+  //   })
 }
 
 /**
@@ -246,16 +247,25 @@ async function _resetToGuestToken(options = { reset: true }) {
   if (options.reset) {
     await API.instance.authentication.reset()
   }
-  const newProvider = await API.instance.service(identityProviderPath).create({
-    type: 'guest',
-    token: uuidv4(),
-    userId: '' as UserID
-  })
+  let newProvider
+  try {
+    const service = API.instance.service(identityProviderPath)
+    newProvider = await service.create({
+      type: 'guest',
+      token: uuidv4(),
+      userId: '' as UserID
+    })
+  } catch (err) {
+    console.error(err)
+  }
   const accessToken = newProvider.accessToken!
   await API.instance.authentication.setAccessToken(accessToken as string)
   writeAuthUserToIframe()
   return accessToken
 }
+
+const timeout = (ms) =>
+  new Promise((_, reject) => setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms))
 
 export const AuthService = {
   async doLoginAuto(forceClientAuthReset?: boolean) {
@@ -266,12 +276,26 @@ export const AuthService = {
     if (location.pathname.startsWith('/auth')) return
     const authState = getMutableState(AuthState)
     try {
-      const rootDomainToken = await getToken()
-
-      if (forceClientAuthReset) await API.instance.authentication.reset()
-
-      if (rootDomainToken?.length > 0) await API.instance.authentication.setAccessToken(rootDomainToken as string)
-      else await _resetToGuestToken({ reset: false })
+      // const rootDomainToken = await getToken()
+      //
+      // if (forceClientAuthReset) await API.instance.authentication.reset()
+      //
+      // if (rootDomainToken?.length > 0) await API.instance.authentication.setAccessToken(rootDomainToken as string)
+      console.log('doLoginAuto')
+      try {
+        await Promise.race([
+          _resetToGuestToken({ reset: false }),
+          timeout(5000) // 5 second timeout
+        ])
+        console.log('_resetToGuestToken after')
+      } catch (error) {
+        if (error.message.includes('timed out')) {
+          console.error('_resetToGuestToken hung - never resolved within timeout')
+        } else {
+          console.error('_resetToGuestToken error:', error)
+        }
+      }
+      console.log('_resetToGuestToken after')
 
       let res: AuthenticationResult
       try {
@@ -350,7 +374,7 @@ export const AuthService = {
       }
       getMutableState(AuthState).merge({ isLoggedIn: true, user })
     } catch (err) {
-      NotificationService.dispatchNotify(i18n.t('common:error.loading-error').toString(), { variant: 'error' })
+      // NotificationService.dispatchNotify(i18n.t('common:error.loading-error').toString(), { variant: 'error' })
       console.error(err)
     }
   },
@@ -358,12 +382,12 @@ export const AuthService = {
   async loginUserByPassword(form: EmailLoginForm) {
     // check email validation.
     if (!validateEmail(form.email)) {
-      NotificationService.dispatchNotify(
-        i18n.t('common:error.validation-error', { type: 'email address' }).toString(),
-        {
-          variant: 'error'
-        }
-      )
+      // NotificationService.dispatchNotify(
+      //   i18n.t('common:error.validation-error', { type: 'email address' }).toString(),
+      //   {
+      //     variant: 'error'
+      //   }
+      // )
 
       return
     }
@@ -383,7 +407,7 @@ export const AuthService = {
       window.location.href = '/'
     } catch (err) {
       authState.merge({ error: i18n.t('common:error.login-error') })
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       authState.merge({ isProcessing: false, error: '' })
     }
@@ -478,7 +502,7 @@ export const AuthService = {
     const ipToRemove = ipResult.data.find((ip) => ip.type === service)
     if (ipToRemove) {
       if (ipResult.total === 1) {
-        NotificationService.dispatchNotify('You can not remove your last login method.', { variant: 'warning' })
+        // NotificationService.dispatchNotify('You can not remove your last login method.', { variant: 'warning' })
       } else {
         const otherIp = ipResult.data.find((ip) => ip.type !== service)
         const newTokenResult = await API.instance.service(generateTokenPath).create({
@@ -533,7 +557,7 @@ export const AuthService = {
       }, TIMEOUT_INTERVAL)
     } catch (err) {
       authState.merge({ error: i18n.t('common:error.login-error') })
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
       window.location.href = `${redirectError}?error=${err.message}`
     } finally {
       authState.merge({ isProcessing: false, error: '' })
@@ -545,7 +569,7 @@ export const AuthService = {
       const res = await API.instance.service(loginPath).get(token)
       await AuthService.loginUserByJwt(res.token!, '/', '/')
     } catch (err) {
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       window.location.href = redirectSuccess
     }
@@ -629,12 +653,12 @@ export const AuthService = {
       const stripped = emailPhone.replace(/-/g, '')
       if (validatePhoneNumber(stripped)) {
         if (!enableSmsMagicLink) {
-          NotificationService.dispatchNotify(
-            i18n.t('common:error.validation-error', { type: 'email address' }).toString(),
-            {
-              variant: 'error'
-            }
-          )
+          // NotificationService.dispatchNotify(
+          //   i18n.t('common:error.validation-error', { type: 'email address' }).toString(),
+          //   {
+          //     variant: 'error'
+          //   }
+          // )
           return
         }
         type = 'sms'
@@ -642,22 +666,22 @@ export const AuthService = {
         emailPhone = '+1' + stripped
       } else if (validateEmail(emailPhone)) {
         if (!enableEmailMagicLink) {
-          NotificationService.dispatchNotify(
-            i18n.t('common:error.validation-error', { type: 'phone number' }).toString(),
-            {
-              variant: 'error'
-            }
-          )
+          // NotificationService.dispatchNotify(
+          //   i18n.t('common:error.validation-error', { type: 'phone number' }).toString(),
+          //   {
+          //     variant: 'error'
+          //   }
+          // )
           return
         }
         type = 'email'
       } else {
-        NotificationService.dispatchNotify(
-          i18n.t('common:error.validation-error', { type: 'email or phone number' }).toString(),
-          {
-            variant: 'error'
-          }
-        )
+        // NotificationService.dispatchNotify(
+        //   i18n.t('common:error.validation-error', { type: 'email or phone number' }).toString(),
+        //   {
+        //     variant: 'error'
+        //   }
+        // )
         return
       }
     }
@@ -671,11 +695,11 @@ export const AuthService = {
         sms: 'sms-sent-msg',
         default: 'success-msg'
       }
-      NotificationService.dispatchNotify(i18n.t(`user:auth.magiclink.${message[type ?? 'default']}`).toString(), {
-        variant: 'success'
-      })
+      // NotificationService.dispatchNotify(i18n.t(`user:auth.magiklink.${message[type ?? 'default']}`).toString(), {
+      //   variant: 'success'
+      // })
     } catch (err) {
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
       throw new Error(err)
     } finally {
       authState.merge({ isProcessing: false, error: '' })
@@ -710,7 +734,7 @@ export const AuthService = {
       return AuthService.loadUserData(identityProvider.userId)
     } catch (err) {
       logger.warn(err, 'Error adding connection by password')
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       authState.merge({ isProcessing: false, error: '' })
     }
@@ -726,13 +750,13 @@ export const AuthService = {
         userId
       })) as IdentityProviderType
       if (identityProvider.userId) {
-        NotificationService.dispatchNotify(i18n.t('user:auth.magiclink.email-sent-msg').toString(), {
-          variant: 'success'
-        })
+        // NotificationService.dispatchNotify(i18n.t('user:auth.magiklink.email-sent-msg').toString(), {
+        //   variant: 'success'
+        // })
         return AuthService.loadUserData(identityProvider.userId)
       }
     } catch (err) {
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       authState.merge({ isProcessing: false, error: '' })
     }
@@ -754,11 +778,11 @@ export const AuthService = {
         userId
       })) as IdentityProviderType
       if (identityProvider.userId) {
-        NotificationService.dispatchNotify(i18n.t('user:auth.magiclink.sms-sent-msg').toString(), { variant: 'error' })
+        // NotificationService.dispatchNotify(i18n.t('user:auth.magiklink.sms-sent-msg').toString(), { variant: 'error' })
         return AuthService.loadUserData(identityProvider.userId)
       }
     } catch (err) {
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       authState.merge({ isProcessing: false, error: '' })
     }
@@ -777,7 +801,7 @@ export const AuthService = {
       await API.instance.service(identityProviderPath).remove(identityProviderId)
       return AuthService.loadUserData(userId)
     } catch (err) {
-      NotificationService.dispatchNotify(err.message, { variant: 'error' })
+      // NotificationService.dispatchNotify(err.message, { variant: 'error' })
     } finally {
       getMutableState(AuthState).merge({ isProcessing: false, error: '' })
     }
@@ -889,7 +913,7 @@ export const useAuthenticated = () => {
   useEffect(() => {
     AuthService.doLoginAuto()
     return () => {
-      communicator.destroy()
+      // communicator.destroy()
     }
   }, [])
 

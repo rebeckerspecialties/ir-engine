@@ -29,8 +29,7 @@ import type { MediaSettingsType } from './schema.type.module'
 /**
  * Config settings (for client and isomorphic engine usage).
  */
-const localBuildOrDev =
-  globalThis.process.env.APP_ENV === 'development' || globalThis.process.env.VITE_LOCAL_BUILD === 'true'
+const localBuildOrDev = process.env.APP_ENV === 'development' || process.env.VITE_LOCAL_BUILD === 'true'
 
 export function validateEmail(email: string): boolean {
   return EMAIL_REGEX.test(email)
@@ -41,60 +40,60 @@ export function validatePhoneNumber(phone: string): boolean {
 }
 
 /** @deprecated - use import from @ir-engine/hyperflux instead */
-export const isDev = globalThis.process.env.APP_ENV === 'development'
+export const isDev = process.env.APP_ENV === 'development'
 
 /**
  * Client / frontend
  */
+// TODO: Make sure to expose only public keys to React Native.
 const client = {
-  appEnv: globalThis.process.env.APP_ENV,
-  nodeEnv: globalThis.process.env.NODE_ENV,
-  localNginx: globalThis.process.env.VITE_LOCAL_NGINX,
-  localBuild: globalThis.process.env.VITE_LOCAL_BUILD,
+  appEnv: process.env.APP_ENV,
+  nodeEnv: process.env.NODE_ENV,
+  localNginx: process.env.VITE_LOCAL_NGINX,
+  localBuild: process.env.VITE_LOCAL_BUILD,
   localBuildOrDev,
   clientUrl:
-    localBuildOrDev && globalThis.process.env.VITE_LOCAL_NGINX !== 'true'
-      ? `https://${globalThis.process.env.VITE_APP_HOST}:${globalThis.process.env.VITE_APP_PORT}`
-      : `https://${globalThis.process.env.VITE_APP_HOST}`,
-  serverHost: globalThis.process.env.VITE_SERVER_HOST,
+    localBuildOrDev && process.env.VITE_LOCAL_NGINX !== 'true'
+      ? `http://${process.env.VITE_APP_HOST}:${process.env.VITE_APP_PORT}`
+      : `http://${process.env.VITE_APP_HOST}`,
+  serverHost: process.env.VITE_SERVER_HOST,
   serverUrl:
-    localBuildOrDev && globalThis.process.env.VITE_LOCAL_NGINX !== 'true'
-      ? `https://${globalThis.process.env.VITE_SERVER_HOST}:${globalThis.process.env.VITE_SERVER_PORT}`
-      : `https://${globalThis.process.env.VITE_SERVER_HOST}`,
+    localBuildOrDev && process.env.VITE_LOCAL_NGINX !== 'true'
+      ? `http://${process.env.VITE_SERVER_HOST}:${process.env.VITE_SERVER_PORT}`
+      : `http://${process.env.VITE_SERVER_HOST}`,
   instanceserverUrl:
-    localBuildOrDev && globalThis.process.env.VITE_LOCAL_NGINX !== 'true'
-      ? `https://${globalThis.process.env.VITE_INSTANCESERVER_HOST}:${globalThis.process.env.VITE_INSTANCESERVER_PORT}`
-      : `https://${globalThis.process.env.VITE_INSTANCESERVER_HOST}`,
+    localBuildOrDev && process.env.VITE_LOCAL_NGINX !== 'true'
+      ? `http://${process.env.VITE_INSTANCESERVER_HOST}:${process.env.VITE_INSTANCESERVER_PORT}`
+      : `http://${process.env.VITE_INSTANCESERVER_HOST}`,
   fileServer:
-    (globalThis.process.env.TEST === 'true'
-      ? globalThis.process.env.VITE_TEST_FILE_SERVER
-      : globalThis.process.env.VITE_FILE_SERVER) ?? 'https://localhost:8642',
-  mediatorServer: globalThis.process.env.VITE_MEDIATOR_SERVER,
+    (process.env.TEST === 'true' ? process.env.VITE_TEST_FILE_SERVER : process.env.VITE_FILE_SERVER) ??
+    'http://localhost:8642',
+  mediatorServer: process.env.VITE_MEDIATOR_SERVER,
   cors: {
     proxyUrl:
-      localBuildOrDev && globalThis.process.env.VITE_LOCAL_NGINX !== 'true'
-        ? `https://${globalThis.process.env.VITE_SERVER_HOST}:${globalThis.process.env.VITE_CORS_SERVER_PORT}`
-        : `https://${globalThis.process.env.VITE_SERVER_HOST}/cors-proxy`,
-    serverPort: globalThis.process.env.VITE_CORS_SERVER_PORT
+      localBuildOrDev && process.env.VITE_LOCAL_NGINX !== 'true'
+        ? `http://${process.env.VITE_SERVER_HOST}:${process.env.VITE_CORS_SERVER_PORT}`
+        : `http://${process.env.VITE_SERVER_HOST}/cors-proxy`,
+    serverPort: process.env.VITE_CORS_SERVER_PORT
   },
   logs: {
-    forceClientAggregate: globalThis.process.env.VITE_FORCE_CLIENT_LOG_AGGREGATE,
-    disabled: globalThis.process.env.VITE_DISABLE_LOG
+    forceClientAggregate: process.env.VITE_FORCE_CLIENT_LOG_AGGREGATE,
+    disabled: process.env.VITE_DISABLE_LOG
   },
   mediaSettings: null! as MediaSettingsType,
-  rootRedirect: globalThis.process.env.VITE_ROOT_REDIRECT,
-  tosAddress: globalThis.process.env.VITE_TERMS_OF_SERVICE_ADDRESS,
-  readyPlayerMeUrl: globalThis.process.env.VITE_READY_PLAYER_ME_URL,
-  avaturnUrl: globalThis.process.env.VITE_AVATURN_URL,
-  avaturnAPI: globalThis.process.env.VITE_AVATURN_API,
-  key8thWall: globalThis.process.env.VITE_8TH_WALL!,
-  featherStoreKey: globalThis.process.env.VITE_FEATHERS_STORE_KEY,
-  gaMeasurementId: globalThis.process.env.VITE_GA_MEASUREMENT_ID,
+  rootRedirect: process.env.VITE_ROOT_REDIRECT,
+  tosAddress: process.env.VITE_TERMS_OF_SERVICE_ADDRESS,
+  readyPlayerMeUrl: process.env.VITE_READY_PLAYER_ME_URL,
+  avaturnUrl: process.env.VITE_AVATURN_URL,
+  avaturnAPI: process.env.VITE_AVATURN_API,
+  key8thWall: process.env.VITE_8TH_WALL!,
+  featherStoreKey: process.env.VITE_FEATHERS_STORE_KEY,
+  gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
 
   zendesk: {
-    enabled: globalThis.process.env.VITE_ZENDESK_ENABLED,
-    authenticationEnabled: globalThis.process.env.VITE_ZENDESK_AUTHENTICATION_ENABLED,
-    key: globalThis.process.env.VITE_ZENDESK_KEY
+    enabled: process.env.VITE_ZENDESK_ENABLED,
+    authenticationEnabled: process.env.VITE_ZENDESK_AUTHENTICATION_ENABLED,
+    key: process.env.VITE_ZENDESK_KEY
   }
 }
 
@@ -104,12 +103,8 @@ const client = {
 export const config = {
   client,
   websocket: {
-    pingTimeout: globalThis.process.env.VITE_WEBSOCKET_PING_TIMEOUT
-      ? parseInt(globalThis.process.env.VITE_WEBSOCKET_PING_TIMEOUT)
-      : 30000,
-    pingInterval: globalThis.process.env.VITE_WEBSOCKET_PING_INTERVAL
-      ? parseInt(globalThis.process.env.VITE_WEBSOCKET_PING_INTERVAL)
-      : 10000
+    pingTimeout: process.env.VITE_WEBSOCKET_PING_TIMEOUT ? parseInt(process.env.VITE_WEBSOCKET_PING_TIMEOUT) : 30000,
+    pingInterval: process.env.VITE_WEBSOCKET_PING_INTERVAL ? parseInt(process.env.VITE_WEBSOCKET_PING_INTERVAL) : 10000
   }
 }
 

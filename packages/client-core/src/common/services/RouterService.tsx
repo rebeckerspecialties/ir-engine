@@ -23,7 +23,7 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { createBrowserHistory, History } from 'history'
+import { BrowserHistory, createBrowserHistory, History } from 'history'
 import i18n from 'i18next'
 import React, { lazy, useEffect, useLayoutEffect } from 'react'
 import { BrowserRouterProps as NativeBrowserRouterProps, Router, useSearchParams } from 'react-router-dom'
@@ -35,7 +35,12 @@ import { loadRoute } from '@ir-engine/projects/loadRoute'
 
 type SearchParamsType = { [key: string]: string }
 
-export const history = createBrowserHistory()
+export let history: BrowserHistory
+
+// TODO: Better detection for React Native
+if (!global.RN$Bridgeless) {
+  history = createBrowserHistory()
+}
 
 export interface BrowserRouterProps extends Omit<NativeBrowserRouterProps, 'window'> {
   history: History

@@ -40,17 +40,22 @@ import { RemoveMaterialsExtension } from '../loaders/gltf/extensions/RemoveMater
 import { ResourceManagerLoadExtension } from '../loaders/gltf/extensions/ResourceManagerLoadExtension'
 import { GLTFLoader } from '../loaders/gltf/GLTFLoader'
 import { KTX2Loader } from '../loaders/gltf/KTX2Loader'
-import { MeshoptDecoder } from '../loaders/gltf/meshopt_decoder.module'
 import { loadDRACODecoderNode, NodeDRACOLoader } from '../loaders/gltf/NodeDracoLoader'
 import { DomainConfigState } from '../state/DomainConfigState'
 
 export const initializeKTX2Loader = (loader: GLTFLoader) => {
   const ktxLoader = new KTX2Loader()
   ktxLoader.setTranscoderPath(getState(DomainConfigState).publicDomain + '/loader_decoders/basis/')
-  const renderer = new WebGLRenderer()
-  ktxLoader.detectSupport(renderer)
-  renderer.dispose()
-  loader.setKTX2Loader(ktxLoader)
+  // FIXME: We are unable to spawn WebGLRenderer without Expo GL context. Is this required?
+  if (global.RN$Bridgeless) {
+    loader.setKTX2Loader(ktxLoader)
+    return
+  } else {
+    const renderer = new WebGLRenderer()
+    ktxLoader.detectSupport(renderer)
+    renderer.dispose()
+    loader.setKTX2Loader(ktxLoader)
+  }
 }
 
 export const createGLTFLoader = (keepMaterials = false) => {
@@ -71,10 +76,19 @@ export const createGLTFLoader = (keepMaterials = false) => {
   loader.register((parser) => new CachedImageLoadExtension(parser))
   loader.register((parser) => new ResourceManagerLoadExtension(parser))
 
-  if (MeshoptDecoder.useWorkers) {
-    MeshoptDecoder.useWorkers(2)
+  // TODO: MeshOptiomizer is not RN compatible.
+  // if (MeshoptDecoder.useWorkers) {
+  //   MeshoptDecoder.useWorkers(2)
+  // }
+  // loader.setMeshoptDecoder(MeshoptDecoder)
+
+  // TODO: Detect React Native better
+  if (global.RN$Bridgeless) {
+    initializeKTX2Loader(loader)
+    const dracoLoader = new DRACOLoader()
+    loader.setDRACOLoader(dracoLoader)
+    return loader
   }
-  loader.setMeshoptDecoder(MeshoptDecoder)
 
   if (isClient) {
     initializeKTX2Loader(loader)
