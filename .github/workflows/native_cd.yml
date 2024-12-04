@@ -61,8 +61,8 @@ jobs:
 
       - name: build javascript bundle
         run: |
-          cd packages/clientNative
           npm install
+          cd packages/clientNative
           npm run build:ios:release
 
       - uses: actions/cache/restore@v4
