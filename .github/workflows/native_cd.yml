@@ -10,9 +10,6 @@ on:
   push:
     branches:
       - dev
-  pull_request:
-    branches:
-      - add-crash-reporting
 
 jobs:
   build_ios_app:
