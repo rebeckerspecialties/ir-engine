@@ -124,7 +124,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # TODO: implement screenshot test
       - name: Create Appium Test Zip
         run: npm run bundle -w screenshot-testing
 
