@@ -126,7 +126,7 @@ jobs:
 
       # TODO: implement screenshot test
       - name: Create Appium Test Zip
-        run: npm run bundle -w benchmarking-scripts
+        run: npm run bundle -w screenshot-testing
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -140,7 +140,6 @@ jobs:
           name: IREngineApp
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # TODO: include screenshot test appium bundle
       - name: Run Screenshot Test
         id: run-benchmark
         uses: aws-actions/aws-devicefarm-mobile-device-testing@v2.3
@@ -156,8 +155,8 @@ jobs:
               },
               "test": {
                 "type": "APPIUM_NODE",
-                "testPackageArn": "packages/benchmarking/MyTests.zip",
-                "testSpecArn": "packages/benchmarking/testSpec.yaml"
+                "testPackageArn": "packages/screenshot-testing/MyTests.zip",
+                "testSpecArn": "packages/screenshot-testing/testSpec.yaml"
               }
             }
           artifact-types: ALL
