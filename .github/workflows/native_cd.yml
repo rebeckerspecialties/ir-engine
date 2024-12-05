@@ -7,6 +7,12 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      overwrite_screenshots:
+        description: 'Overwrite existing screenshots with output of test run'
+        default: false
+        required: false
+        type: boolean
   push:
     branches:
       - dev
@@ -168,7 +174,19 @@ jobs:
 
       - name: Extract screenshots from artifacts
         run: |
-          ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} screenshots
+          ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} packages/screenshot-testing/screenshots
+
+      - uses: actions/download-artifact@v4
+        if: inputs.overwrite_screenshots
+        with:
+          name: ExpectedScreenshots
+          path: packages/screenshot-testing/expectedScreenshots
 
       - name: Compare Screenshots
         run: npm run screenshot-test -w screenshot-testing
+
+      - uses: actions/upload-artifact@v4
+        if: inputs.overwrite_screenshots
+        with:
+          name: ExpectedScreenshots
+          path: packages/screenshot-testing/screenshots
