@@ -1,0 +1,21 @@
+{
+  "name": "screenshot-tests-native",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "node main.js",
+    "bundle": "./bundle.sh"
+  },
+  "dependencies": {
+    "webdriverio": "^9.0.6"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  },
+  "bundleDependencies": [
+    "webdriverio"
+  ]
+}
