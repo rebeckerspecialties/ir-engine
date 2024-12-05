@@ -46,8 +46,9 @@ async function runScreenshotTest(testId: string, driver: Browser, skipIfJavaScri
   const outputPath = `${perfTraceDir}/${testId}Screenshot.png`
 
   const screenshot = await driver.takeScreenshot()
+  const buffer = Buffer.from(screenshot, 'base64')
 
-  await writeFile(outputPath, screenshot)
+  await writeFile(outputPath, buffer)
   console.log('Screenshot written to', outputPath)
 }
 
