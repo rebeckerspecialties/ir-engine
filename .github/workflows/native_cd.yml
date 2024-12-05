@@ -165,3 +165,10 @@ jobs:
         with:
           name: ScreenshotTestOutputFiles
           path: ${{ steps.run-benchmark.outputs.artifact-folder }}
+
+      - name: Extract screenshots from artifacts
+        run: |
+          ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} screenshots
+
+      - name: Compare Screenshots
+        run: npm run screenshot-test -w screenshot-testing
