@@ -128,7 +128,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Create Appium Test Zip
         run: npm run bundle -w screenshot-testing
