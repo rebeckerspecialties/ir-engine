@@ -185,7 +185,7 @@ jobs:
         run: npm run screenshot-test -w screenshot-testing
 
       - uses: actions/upload-artifact@v4
-        if: !cancelled() && inputs.overwrite_screenshots
+        if: failure() && inputs.overwrite_screenshots
         with:
           name: ExpectedScreenshots
           path: packages/screenshot-testing/screenshots
