@@ -19,6 +19,7 @@ do
 
   find "$2/$deviceType/output" -name '*.png' | while read screenshot; do
     echo "$screenshot"
+    magick "$screenshot" -crop 1178x2400+0+156 "$screenshot"
     mv "$screenshot" "$2/$deviceType"
   done
 
