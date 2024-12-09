@@ -62,6 +62,12 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - name: Checkout test project repo
+        uses: actions/checkout@v4
+        with:
+          repository: ir-engine/ir-tutorial-hello
+          path: projects/packages
+
       - name: build javascript bundle
         run: |
           npm install
