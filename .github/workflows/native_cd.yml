@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ir-engine/ir-tutorial-hello
-          path: packages/projects
+          path: packages/projects/ir-tutorial-hello
 
       - name: build javascript bundle
         run: |
