@@ -214,6 +214,10 @@ jobs:
           name: IREngineApp
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload to TestFlight
+      - name: Validate IPA and Upload to TestFlight
+        env:
+          APP_STORE_USERNAME: ${{ secrets.APP_STORE_USERNAME }}
+          APP_STORE_PASSWORD: ${{ secrets.APP_STORE_PASSWORD }}
         run: |
-          # TODO: use connect API
+          xcrun altool --validate-app --file "clientNative.ipa" --username "$APP_STORE_USERNAME" --password "$APP_STORE_PASSWORD"
+          xcrun altool --upload-app --file "clientNative.ipa" --username "$APP_STORE_USERNAME" --password "$APP_STORE_PASSWORD"
