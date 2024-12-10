@@ -136,6 +136,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - uses: actions/cache/restore@v4
+        id: cache-screenshots
+        with:
+          path: packages/screenshot-testing/expectedScreenshots
+          key: default-key
+          restore-keys: |
+            expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+            expected-screenshots
+
       - name: Create Appium Test Zip
         run: npm run bundle -w screenshot-testing
 
@@ -185,14 +194,6 @@ jobs:
       - name: Extract screenshots from artifacts
         run: |
           ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} packages/screenshot-testing/screenshots
-
-      - uses: actions/cache/restore@v4
-        id: cache-screenshots
-        with:
-          path: packages/screenshot-testing/expectedScreenshots
-          key: default-key
-          restore-keys: |
-            expected-screenshots-
 
       - name: Compare Screenshots
         run: npm run screenshot-test -w screenshot-testing
