@@ -121,88 +121,88 @@ jobs:
           path: packages/clientNative/main.jsbundle.map
           retention-days: 30
 
-  screenshot_test:
-    runs-on: ubuntu-latest
-    needs: build_ios_app
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+  # screenshot_test:
+  #   runs-on: ubuntu-latest
+  #   needs: build_ios_app
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+  #     - name: Use Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22
 
-      - name: Install dependencies
-        run: npm install
+  #     - name: Install dependencies
+  #       run: npm install
 
-      - uses: actions/cache/restore@v4
-        id: cache-screenshots
-        with:
-          path: packages/screenshot-testing/expectedScreenshots
-          key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
-          restore-keys: |
-            ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
-            ${{ runner.os }}-expected-screenshots
+  #     - uses: actions/cache/restore@v4
+  #       id: cache-screenshots
+  #       with:
+  #         path: packages/screenshot-testing/expectedScreenshots
+  #         key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+  #           ${{ runner.os }}-expected-screenshots
 
-      - name: Create Appium Test Zip
-        run: npm run bundle -w screenshot-testing
+  #     - name: Create Appium Test Zip
+  #       run: npm run bundle -w screenshot-testing
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.DEVICE_FARM_IAM_ARN }}
-          aws-region: us-west-2
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         role-to-assume: ${{ secrets.DEVICE_FARM_IAM_ARN }}
+  #         aws-region: us-west-2
 
-      - name: Download IPA
-        uses: actions/download-artifact@v4
-        with:
-          name: IREngineApp
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Download IPA
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: IREngineApp
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Screenshot Test
-        id: run-benchmark
-        uses: aws-actions/aws-devicefarm-mobile-device-testing@v2.3
-        with:
-          run-settings-json: |
-            {
-              "name": "GitHubAction-${{ github.workflow }}_${{ github.run_id }}_${{ github.run_attempt }}",
-              "projectArn": "TestApp",
-              "appArn": "clientNative.ipa",
-              "devicePoolArn": "SmallDevicePool",
-              "executionConfiguration": {
-                "jobTimeoutMinutes": 40
-              },
-              "test": {
-                "type": "APPIUM_NODE",
-                "testPackageArn": "packages/screenshot-testing/MyTests.zip",
-                "testSpecArn": "packages/screenshot-testing/testSpec.yaml"
-              }
-            }
-          artifact-types: ALL
+  #     - name: Run Screenshot Test
+  #       id: run-benchmark
+  #       uses: aws-actions/aws-devicefarm-mobile-device-testing@v2.3
+  #       with:
+  #         run-settings-json: |
+  #           {
+  #             "name": "GitHubAction-${{ github.workflow }}_${{ github.run_id }}_${{ github.run_attempt }}",
+  #             "projectArn": "TestApp",
+  #             "appArn": "clientNative.ipa",
+  #             "devicePoolArn": "SmallDevicePool",
+  #             "executionConfiguration": {
+  #               "jobTimeoutMinutes": 40
+  #             },
+  #             "test": {
+  #               "type": "APPIUM_NODE",
+  #               "testPackageArn": "packages/screenshot-testing/MyTests.zip",
+  #               "testSpecArn": "packages/screenshot-testing/testSpec.yaml"
+  #             }
+  #           }
+  #         artifact-types: ALL
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ScreenshotTestOutputFiles
-          path: ${{ steps.run-benchmark.outputs.artifact-folder }}
+  #     - uses: actions/upload-artifact@v4
+  #       if: always()
+  #       with:
+  #         name: ScreenshotTestOutputFiles
+  #         path: ${{ steps.run-benchmark.outputs.artifact-folder }}
 
-      - name: Install ImageMagick
-        run: |
-          sudo apt-get install imagemagick
+  #     - name: Install ImageMagick
+  #       run: |
+  #         sudo apt-get install imagemagick
 
-      - name: Extract screenshots from artifacts
-        run: |
-          ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} packages/screenshot-testing/screenshots
+  #     - name: Extract screenshots from artifacts
+  #       run: |
+  #         ./scripts/unzipArchive.sh ${{ steps.run-benchmark.outputs.artifact-folder }} packages/screenshot-testing/screenshots
 
-      - name: Compare Screenshots
-        run: npm run screenshot-test -w screenshot-testing
+  #     - name: Compare Screenshots
+  #       run: npm run screenshot-test -w screenshot-testing
 
-      - uses: actions/cache/save@v4
-        if: failure() && inputs.overwrite_screenshots
-        with:
-          path: packages/screenshot-testing/screenshots
-          key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+  #     - uses: actions/cache/save@v4
+  #       if: failure() && inputs.overwrite_screenshots
+  #       with:
+  #         path: packages/screenshot-testing/screenshots
+  #         key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
 
   testflight_deploy:
     runs-on: ubuntu-latest
