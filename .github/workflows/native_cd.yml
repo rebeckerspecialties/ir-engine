@@ -190,7 +190,9 @@ jobs:
         id: cache-screenshots
         with:
           path: packages/screenshot-testing/expectedScreenshots
-          key: expected-screenshots
+          key: default-key
+          restore-keys: |
+            expected-screenshots-
 
       - name: Compare Screenshots
         run: npm run screenshot-test -w screenshot-testing
@@ -199,4 +201,4 @@ jobs:
         if: failure() && inputs.overwrite_screenshots
         with:
           path: packages/screenshot-testing/screenshots
-          key: expected-screenshots
+          key: expected-screenshots-${{ hashFiles('packages/screenshot-testing/screenshots/**.png') }}
