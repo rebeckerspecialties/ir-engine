@@ -201,4 +201,4 @@ jobs:
         if: failure() && inputs.overwrite_screenshots
         with:
           path: packages/screenshot-testing/screenshots
-          key: expected-screenshots-${{ hashFiles('packages/screenshot-testing/screenshots/**.png') }}
+          key: expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
