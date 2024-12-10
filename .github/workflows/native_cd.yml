@@ -218,6 +218,8 @@ jobs:
         env:
           APP_STORE_USERNAME: ${{ secrets.APP_STORE_USERNAME }}
           APP_STORE_PASSWORD: ${{ secrets.APP_STORE_PASSWORD }}
+          ASC_PUBLIC_ID: ${{ secrets.ASC_PUBLIC_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
         run: |
-          xcrun altool --validate-app --file "clientNative.ipa" --username "$APP_STORE_USERNAME" --password "$APP_STORE_PASSWORD"
-          xcrun altool --upload-app --file "clientNative.ipa" --username "$APP_STORE_USERNAME" --password "$APP_STORE_PASSWORD"
+          xcrun altool --validate-app --file "clientNative.ipa" --username "$APP_STORE_USERNAME" --password "$APP_STORE_PASSWORD" --type ios
+          xcrun altool --upload-package "clientNative.ipa" --type ios --asc-public-id "$ASC_PUBLIC_ID" --apple-id "$APPLE_ID" --bundle-version '1' --bundle-short-version-string '1.0' --bundle-id 'com.ir-engine.reactapp' -u "$APP_STORE_USERNAME" -p "$APP_STORE_PASSWORD"
