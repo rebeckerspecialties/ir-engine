@@ -203,3 +203,17 @@ jobs:
         with:
           path: packages/screenshot-testing/screenshots
           key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+
+  testflight_deploy:
+    runs-on: ubuntu-latest
+    needs: build_ios_app
+    steps:
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: IREngineApp
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to TestFlight
+        run: |
+          # TODO: use connect API
