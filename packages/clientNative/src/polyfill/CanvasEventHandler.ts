@@ -46,6 +46,7 @@ export function createCanvasEventHandler() {
   };
 
   // TODO: add the correct variant of listenerRegistry.get(type).forEach((handler) => handler(evt))
+  // TODO: mappings from DOM to Native: https://github.com/EvanBacon/expo-three-orbit-controls/blob/master/src/OrbitControlsView.tsx
   const panResponder: PanResponderCallbacks = {
     // Ask to be the responder:
     onStartShouldSetPanResponder: (evt, gestureState) => true,
