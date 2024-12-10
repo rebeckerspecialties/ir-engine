@@ -140,10 +140,10 @@ jobs:
         id: cache-screenshots
         with:
           path: packages/screenshot-testing/expectedScreenshots
-          key: default-key
+          key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
           restore-keys: |
-            expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
-            expected-screenshots
+            ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+            ${{ runner.os }}-expected-screenshots
 
       - name: Create Appium Test Zip
         run: npm run bundle -w screenshot-testing
@@ -202,4 +202,4 @@ jobs:
         if: failure() && inputs.overwrite_screenshots
         with:
           path: packages/screenshot-testing/screenshots
-          key: expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
+          key: ${{ runner.os }}-expected-screenshots-${{ hashFiles('packages/screenshot-testing/**/*.png') }}
