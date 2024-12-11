@@ -23,32 +23,14 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import {createHyperStore} from '@ir-engine/hyperflux';
+import {createEngine} from '@ir-engine/ecs/src/Engine';
+import {HyperFlux} from '@ir-engine/hyperflux';
 import {startTimer} from '@ir-engine/spatial/src/startTimer';
-import React, {lazy, Suspense} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import React from 'react';
 
-createHyperStore();
+createEngine(HyperFlux.store);
+startTimer();
 
-const CustomLoadingPage = lazy(() => import('./src/CustomLocationPage'));
-
-function App() {
-  return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <View>
-        <Suspense fallback={null}>
-          <CustomLoadingPage />
-        </Suspense>
-      </View>
-    </SafeAreaView>
-  );
+export default function ({children}: {children: React.ReactNode}) {
+  return <>{children}</>;
 }
-
-export default App;
