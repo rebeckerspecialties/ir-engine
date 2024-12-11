@@ -223,7 +223,7 @@ export const RendererComponent = defineComponent({
 
       const renderer = new WebGLRenderer(options)
       renderer.setSize(context.drawingBufferWidth, context.drawingBufferHeight)
-      renderer.setClearColor(0xff0000)
+      renderer.setClearColor(0x000000)
       rendererComponent.renderer.set(renderer)
       renderer.outputColorSpace = SRGBColorSpace
 
@@ -338,7 +338,7 @@ export const render = (
     }
     RendererComponent.activeRender = true
     const context = renderer.renderContext as ExpoWebGLRenderingContext
-    camera.aspect = context.drawingBufferWidth / context.drawingBufferHeight
+    // camera.aspect = context.drawingBufferWidth / context.drawingBufferHeight
     // Use Basic rendering on React Native for now as postprocessing causes issues with frambuffers.
     //
     for (const c of camera.cameras) c.layers.mask = camera.layers.mask
