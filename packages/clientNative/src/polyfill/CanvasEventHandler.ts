@@ -30,6 +30,10 @@ import {
 } from 'react-native';
 
 type DomEventHandler = (evt: GestureResponderEvent) => void;
+export type EventListenerRegistry = {
+  addEventListener: (type: string, handler: DomEventHandler) => void;
+  removeEventListener: (type: string, handler: DomEventHandler) => void;
+};
 
 export function createCanvasEventHandler() {
   const listenerRegistry: Map<string, Set<DomEventHandler>> = new Map();
@@ -62,7 +66,7 @@ export function createCanvasEventHandler() {
     }
   };
 
-  const panResponder: PanResponderCallbacks = {
+  const panResponderCallbacks: PanResponderCallbacks = {
     onStartShouldSetPanResponder: () => true,
     onStartShouldSetPanResponderCapture: () => true,
     onMoveShouldSetPanResponder: () => true,
@@ -74,8 +78,13 @@ export function createCanvasEventHandler() {
     onPanResponderRelease: attachListeners.bind(null, 'pointerup'),
   };
 
+  const eventListenerRegistry: EventListenerRegistry = {
+    addEventListener,
+    removeEventListener,
+  };
+
   return {
-    eventListener: {addEventListener, removeEventListener},
-    panResponder,
+    eventListenerRegistry,
+    panResponderCallbacks,
   };
 }
