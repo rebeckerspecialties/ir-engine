@@ -23,9 +23,13 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import {PanResponderCallbacks} from 'react-native';
+import {
+  GestureResponderEvent,
+  PanResponderCallbacks,
+  PanResponderGestureState,
+} from 'react-native';
 
-type DomEventHandler = (evt: Event) => void;
+type DomEventHandler = (evt: GestureResponderEvent) => void;
 
 export function createCanvasEventHandler() {
   const listenerRegistry: Map<string, Set<DomEventHandler>> = new Map();
@@ -45,39 +49,29 @@ export function createCanvasEventHandler() {
     }
   };
 
-  // TODO: add the correct variant of listenerRegistry.get(type).forEach((handler) => handler(evt))
-  // TODO: mappings from DOM to Native: https://github.com/EvanBacon/expo-three-orbit-controls/blob/master/src/OrbitControlsView.tsx
-  const panResponder: PanResponderCallbacks = {
-    // Ask to be the responder:
-    onStartShouldSetPanResponder: (evt, gestureState) => true,
-    onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-    onMoveShouldSetPanResponder: (evt, gestureState) => true,
-    onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+  const attachListeners = (
+    eventType: string,
+    evt: GestureResponderEvent,
+    _gestureState: PanResponderGestureState,
+  ) => {
+    const listeners = listenerRegistry.get(eventType);
+    if (listeners) {
+      for (const listener of listeners) {
+        listener(evt);
+      }
+    }
+  };
 
-    onPanResponderGrant: (evt, gestureState) => {
-      // The gesture has started. Show visual feedback so the user knows
-      // what is happening!
-      // gestureState.d{x,y} will be set to zero now
-    },
-    onPanResponderMove: (evt, gestureState) => {
-      // The most recent move distance is gestureState.move{X,Y}
-      // The accumulated gesture distance since becoming responder is
-      // gestureState.d{x,y}
-    },
+  const panResponder: PanResponderCallbacks = {
+    onStartShouldSetPanResponder: () => true,
+    onStartShouldSetPanResponderCapture: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponderCapture: () => true,
+
+    onPanResponderGrant: attachListeners.bind(null, 'pointerdown'),
+    onPanResponderMove: attachListeners.bind(null, 'pointermove'),
     onPanResponderTerminationRequest: (evt, gestureState) => true,
-    onPanResponderRelease: (evt, gestureState) => {
-      // The user has released all touches while this view is the
-      // responder. This typically means a gesture has succeeded
-    },
-    onPanResponderTerminate: (evt, gestureState) => {
-      // Another component has become the responder, so this gesture
-      // should be cancelled
-    },
-    onShouldBlockNativeResponder: (evt, gestureState) => {
-      // Returns whether this component should block native components from becoming the JS
-      // responder. Returns true by default. Is currently only supported on android.
-      return true;
-    },
+    onPanResponderRelease: attachListeners.bind(null, 'pointerup'),
   };
 
   return {
