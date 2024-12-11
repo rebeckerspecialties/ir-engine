@@ -68,6 +68,7 @@ import {
 } from './polyfill/NativeHTMLCanvasElement';
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
 import {GLView} from 'expo-gl';
+import '@ir-engine/spatial/src/input/systems/ClientInputSystem';
 
 const SceneState = defineState({
   name: 'ee.minimalist.SceneState',
