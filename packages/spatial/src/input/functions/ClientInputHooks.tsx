@@ -89,19 +89,19 @@ export const useNonSpatialInputSources = () => {
       axes[index + 0] = value.x
       axes[index + 1] = value.y
     }
-    // document.addEventListener('touchstickmove', handleTouchDirectionalPad)
+    window.addEventListener('touchstickmove', handleTouchDirectionalPad)
 
     const handleTouchGamepadButtonDown = (event: CustomEvent) => {
       const buttonState = inputSourceComponent.buttons
       buttonState[event.detail.button] = createInitialButtonState(eid)
     }
-    // document.addEventListener('touchgamepadbuttondown', handleTouchGamepadButtonDown)
+    window.addEventListener('touchgamepadbuttondown', handleTouchGamepadButtonDown)
 
     const handleTouchGamepadButtonUp = (event: CustomEvent) => {
       const buttonState = inputSourceComponent.buttons
       if (buttonState[event.detail.button]) buttonState[event.detail.button].up = true
     }
-    // document.addEventListener('touchgamepadbuttonup', handleTouchGamepadButtonUp)
+    window.addEventListener('touchgamepadbuttonup', handleTouchGamepadButtonUp)
 
     return () => {
       // document.removeEventListener('DOMMouseScroll', ClientInputFunctions.preventDefault, false)
@@ -109,9 +109,9 @@ export const useNonSpatialInputSources = () => {
       // document.removeEventListener('keyup', onKeyEvent)
       // document.removeEventListener('keydown', onKeyEvent)
       // document.removeEventListener('keydown', ClientInputFunctions.preventDefaultKeyDown, false)
-      // document.removeEventListener('touchstickmove', handleTouchDirectionalPad)
-      // document.removeEventListener('touchgamepadbuttondown', handleTouchGamepadButtonDown)
-      // document.removeEventListener('touchgamepadbuttonup', handleTouchGamepadButtonUp)
+      window.removeEventListener('touchstickmove', handleTouchDirectionalPad)
+      window.removeEventListener('touchgamepadbuttondown', handleTouchGamepadButtonDown)
+      window.removeEventListener('touchgamepadbuttonup', handleTouchGamepadButtonUp)
       removeEntity(eid)
     }
   }, [])

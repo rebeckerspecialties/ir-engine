@@ -44,5 +44,29 @@ global.localStorage = {
     return (this._data = {});
   },
 };
-window.addEventListener = () => {};
-window.removeEventListener = () => {};
+
+// Window polyfill
+const listenerRegistry = new Map();
+
+window.addEventListener = (type, handler) => {
+  let registry = listenerRegistry.get(type);
+  if (!registry) {
+    registry = new Set();
+    listenerRegistry.set(type, registry);
+  }
+  registry.add(handler);
+};
+window.removeEventListener = (type, handler) => {
+  const registry = listenerRegistry.get(type);
+  if (registry) {
+    registry.delete(handler);
+  }
+};
+window.dispatchEvent = (eventType, evt) => {
+  const listeners = listenerRegistry.get(eventType);
+  if (listeners) {
+    for (const listener of listeners) {
+      listener(evt.nativeEvent);
+    }
+  }
+};
