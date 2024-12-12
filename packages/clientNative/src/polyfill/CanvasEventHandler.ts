@@ -65,7 +65,7 @@ export function createCanvasEventHandler() {
 
   const pointerEvents: PointerEvents = {
     onPointerEnter: firePointerEvent.bind(null, 'pointerenter'),
-    onPointerLeave: firePointerEvent.bind(null, 'pointerLeave'),
+    onPointerLeave: firePointerEvent.bind(null, 'pointerleave'),
     onPointerMove: firePointerEvent.bind(null, 'pointermove'),
     onPointerUp: firePointerEvent.bind(null, 'pointerup'),
     onPointerDown: firePointerEvent.bind(null, 'pointerdown'),

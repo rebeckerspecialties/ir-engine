@@ -275,7 +275,6 @@ export const CanvasInputReactor = () => {
     }
 
     const onPointerMove = (event: PointerEvent) => {
-      console.log('pointer move')
       const pointerEntity = InputPointerComponent.getPointerByID(cameraEntity, event.pointerId)
       const pointerComponent = getOptionalComponent(pointerEntity, InputPointerComponent)
       if (!pointerComponent) return

@@ -69,6 +69,9 @@ import {
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
 import {GLView} from 'expo-gl';
 import '@ir-engine/spatial/src/input/systems/ClientInputSystem';
+import '@ir-engine/spatial/src/camera/systems/CameraOrbitSystem';
+import '@ir-engine/spatial/src/input/systems/FlyControlSystem';
+import {FlyControlComponent} from '@ir-engine/spatial/src/camera/components/FlyControlComponent';
 
 const SceneState = defineState({
   name: 'ee.minimalist.SceneState',
@@ -117,6 +120,8 @@ const UpdateSystem = defineSystem({
       cameraTransform.rotation.copy(camera.quaternion);
       computeTransformMatrix(viewerEntity);
       camera.lookAt(0, 0, 0);
+
+      setComponent(viewerEntity, FlyControlComponent);
 
       getMutableState(SceneState).entity.set(entity);
     }, [viewerEntity]);
