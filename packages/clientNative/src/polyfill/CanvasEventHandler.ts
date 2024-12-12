@@ -23,13 +23,9 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import {
-  GestureResponderEvent,
-  PanResponderCallbacks,
-  PanResponderGestureState,
-} from 'react-native';
+import {NativePointerEvent, PointerEvent, PointerEvents} from 'react-native';
 
-type DomEventHandler = (evt: GestureResponderEvent) => void;
+type DomEventHandler = (evt: NativePointerEvent) => void;
 export type EventListenerRegistry = {
   addEventListener: (type: string, handler: DomEventHandler) => void;
   removeEventListener: (type: string, handler: DomEventHandler) => void;
@@ -53,29 +49,13 @@ export function createCanvasEventHandler() {
     }
   };
 
-  const attachListeners = (
-    eventType: string,
-    evt: GestureResponderEvent,
-    _gestureState: PanResponderGestureState,
-  ) => {
+  const firePointerEvent = (eventType: string, evt: PointerEvent) => {
     const listeners = listenerRegistry.get(eventType);
     if (listeners) {
       for (const listener of listeners) {
-        listener(evt);
+        listener(evt.nativeEvent);
       }
     }
-  };
-
-  const panResponderCallbacks: PanResponderCallbacks = {
-    onStartShouldSetPanResponder: () => true,
-    onStartShouldSetPanResponderCapture: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponderCapture: () => true,
-
-    onPanResponderGrant: attachListeners.bind(null, 'pointerdown'),
-    onPanResponderMove: attachListeners.bind(null, 'pointermove'),
-    onPanResponderTerminationRequest: (evt, gestureState) => true,
-    onPanResponderRelease: attachListeners.bind(null, 'pointerup'),
   };
 
   const eventListenerRegistry: EventListenerRegistry = {
@@ -83,8 +63,16 @@ export function createCanvasEventHandler() {
     removeEventListener,
   };
 
+  const pointerEvents: PointerEvents = {
+    onPointerEnter: firePointerEvent.bind(null, 'pointerenter'),
+    onPointerLeave: firePointerEvent.bind(null, 'pointerLeave'),
+    onPointerMove: firePointerEvent.bind(null, 'pointermove'),
+    onPointerUp: firePointerEvent.bind(null, 'pointerup'),
+    onPointerDown: firePointerEvent.bind(null, 'pointerdown'),
+  };
+
   return {
     eventListenerRegistry,
-    panResponderCallbacks,
+    pointerEvents,
   };
 }

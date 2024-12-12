@@ -61,7 +61,7 @@ import {
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {BoxGeometry, Mesh, MeshBasicMaterial} from 'three';
 import {createCanvasEventHandler} from './polyfill/CanvasEventHandler';
-import {Dimensions, PanResponder, View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
@@ -125,18 +125,13 @@ const UpdateSystem = defineSystem({
   },
 });
 
-const {eventListenerRegistry, panResponderCallbacks} =
-  createCanvasEventHandler();
+const {eventListenerRegistry, pointerEvents} = createCanvasEventHandler();
 
 const {width, height} = Dimensions.get('window');
 console.log(width, height);
 
 export default function Template() {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-
-  const panResponder = useRef(
-    PanResponder.create(panResponderCallbacks),
-  ).current;
 
   const onContextCreate = useCallback(
     (context: NativeWebGLRenderingContext) => {
@@ -155,7 +150,7 @@ export default function Template() {
   useEngineCanvas(canvas);
 
   return (
-    <View {...panResponder.panHandlers}>
+    <View {...pointerEvents}>
       <GLView style={{width, height}} onContextCreate={onContextCreate} />
     </View>
   );
