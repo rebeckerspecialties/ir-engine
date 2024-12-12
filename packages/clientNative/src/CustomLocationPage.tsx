@@ -58,7 +58,7 @@ import {
   computeTransformMatrix,
 } from '@ir-engine/spatial/src/transform/systems/TransformSystem';
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {BoxGeometry, Mesh, MeshBasicMaterial} from 'three';
 import {createCanvasEventHandler} from './polyfill/CanvasEventHandler';
 import {Dimensions, View} from 'react-native';

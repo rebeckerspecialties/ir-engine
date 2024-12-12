@@ -38,6 +38,7 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
   public addEventListener;
   public removeEventListener;
   public clientHeight: number;
+  public clientWidth: number;
 
   private context: NativeWebGLRenderingContext;
 
@@ -49,6 +50,7 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
     this.height = context.drawingBufferHeight;
     this.style = {};
     this.clientHeight = context.drawingBufferHeight;
+    this.clientWidth = context.drawingBufferWidth;
     this.context = context;
     this.addEventListener = eventListenerRegistry.addEventListener;
     this.removeEventListener = eventListenerRegistry.removeEventListener;
@@ -59,5 +61,18 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
       return this.context;
     }
     throw new Error(`Unsupported context: ${glContext}`);
+  }
+
+  public getBoundingClientRect() {
+    return {
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: this.width,
+      bottom: this.height,
+      width: this.width,
+      height: this.height,
+    };
   }
 }
