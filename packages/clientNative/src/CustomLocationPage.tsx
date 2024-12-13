@@ -30,6 +30,7 @@ import {
   createEntity,
   defineSystem,
   getComponent,
+  getOptionalComponent,
   setComponent,
 } from '@ir-engine/ecs';
 import {ECSState} from '@ir-engine/ecs/src/ECSState';
@@ -59,7 +60,14 @@ import {
 } from '@ir-engine/spatial/src/transform/systems/TransformSystem';
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {BoxGeometry, Mesh, MeshBasicMaterial} from 'three';
+import {
+  BoxGeometry,
+  Euler,
+  Mesh,
+  MeshBasicMaterial,
+  Quaternion,
+  Vector3,
+} from 'three';
 import {createCanvasEventHandler} from './polyfill/CanvasEventHandler';
 import {Dimensions, View} from 'react-native';
 import {
@@ -73,6 +81,7 @@ import '@ir-engine/spatial/src/camera/systems/FollowCameraInputSystem';
 // import '@ir-engine/spatial/src/input/systems/FlyControlSystem';
 import {FollowCameraComponent} from '@ir-engine/spatial/src/camera/components/FollowCameraComponent';
 import {TouchGamepad} from './common/components/TouchGamepad';
+import {TargetCameraRotationComponent} from '@ir-engine/spatial/src/camera/components/TargetCameraRotationComponent';
 
 const SceneState = defineState({
   name: 'ee.minimalist.SceneState',
@@ -91,6 +100,23 @@ const UpdateSystem = defineSystem({
     const elapsedSeconds = getState(ECSState).elapsedSeconds;
     const transformComponent = getComponent(entity, TransformComponent);
     transformComponent.rotation.setFromAxisAngle(Vector3_Up, elapsedSeconds);
+
+    // const viewerEntity = getMutableState(EngineState).viewerEntity.value;
+    // const cameraTransform = getComponent(viewerEntity, TransformComponent);
+    // const cameraRotation = getOptionalComponent(
+    //   viewerEntity,
+    //   FollowCameraComponent,
+    // );
+    // if (cameraRotation) {
+    //   cameraTransform.rotation.setFromEuler(
+    //     new Euler(
+    //       0,
+    //       (cameraRotation.theta * Math.PI) / 180,
+    //       (cameraRotation.phi * Math.PI) / 180,
+    //     ),
+    //     true,
+    //   );
+    // }
   },
   reactor: function () {
     const viewerEntity = useMutableState(EngineState).viewerEntity.value;
@@ -122,7 +148,10 @@ const UpdateSystem = defineSystem({
       computeTransformMatrix(viewerEntity);
       camera.lookAt(0, 0, 0);
 
-      setComponent(viewerEntity, FollowCameraComponent);
+      setComponent(viewerEntity, FollowCameraComponent, {
+        targetEntity: Engine.instance.originEntity,
+        thirdPersonOffset: new Vector3(0, 1, -2),
+      });
 
       getMutableState(SceneState).entity.set(entity);
     }, [viewerEntity]);
