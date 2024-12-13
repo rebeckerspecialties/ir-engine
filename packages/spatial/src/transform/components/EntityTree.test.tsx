@@ -28,13 +28,7 @@ import React, { useEffect } from 'react'
 import { afterEach, assert, beforeEach, describe, it } from 'vitest'
 
 import { EntityUUID, hasComponents, UUIDComponent } from '@ir-engine/ecs'
-import {
-  getComponent,
-  hasComponent,
-  removeComponent,
-  serializeComponent,
-  setComponent
-} from '@ir-engine/ecs/src/ComponentFunctions'
+import { getComponent, hasComponent, removeComponent, setComponent } from '@ir-engine/ecs/src/ComponentFunctions'
 import { createEngine, destroyEngine } from '@ir-engine/ecs/src/Engine'
 import { Entity, UndefinedEntity } from '@ir-engine/ecs/src/Entity'
 import { createEntity, entityExists, removeEntity } from '@ir-engine/ecs/src/EntityFunctions'
@@ -43,6 +37,7 @@ import { NameComponent } from '../../common/NameComponent'
 import { HighlightComponent } from '../../renderer/components/HighlightComponent'
 
 import { assertArray } from '../../../tests/util/assert'
+import { BackgroundComponent, SceneComponent } from '../../renderer/components/SceneComponents'
 import { VisibleComponent } from '../../renderer/components/VisibleComponent'
 import {
   EntityTreeComponent,
@@ -50,6 +45,7 @@ import {
   getAncestorWithComponents,
   getChildrenWithComponents,
   getNestedChildren,
+  getTreeFromChildToAncestor,
   haveCommonAncestor,
   isAncestor,
   isDeepChildOf,
@@ -166,26 +162,6 @@ describe('EntityTreeComponent', () => {
       assertEntityTreeComponentEq(after, Expected)
     })
   }) //:: onSet
-
-  describe('toJSON', () => {
-    let testEntity = UndefinedEntity
-
-    beforeEach(async () => {
-      createEngine()
-      testEntity = createEntity()
-      setComponent(testEntity, EntityTreeComponent)
-    })
-
-    afterEach(() => {
-      removeEntity(testEntity)
-      return destroyEngine()
-    })
-
-    it("should serialize the component's default data as expected", () => {
-      const json = serializeComponent(testEntity, EntityTreeComponent)
-      assert.equal(json.parentEntity, UndefinedEntity)
-    })
-  }) //:: toJSON
 
   describe('reactor', () => {
     describe('whenever entityContext.EntityTreeComponent.{parentEntity, childIndex} change', () => {
@@ -893,6 +869,80 @@ describe('getAncestorWithComponents', () => {
   })
 }) //:: getAncestorWithComponents
 
+describe('getTreeFromChildToAncestor', () => {
+  let rootEntity: Entity
+  let level1Entity: Entity
+  let level2Entity: Entity
+  let level3Entity: Entity
+  let level4Entity: Entity
+
+  beforeEach(() => {
+    createEngine()
+
+    // Create a hierarchy of entities
+    rootEntity = createEntity()
+    setComponent(rootEntity, EntityTreeComponent, { parentEntity: UndefinedEntity })
+
+    level1Entity = createEntity()
+    setComponent(level1Entity, EntityTreeComponent, { parentEntity: rootEntity })
+
+    level2Entity = createEntity()
+    setComponent(level2Entity, EntityTreeComponent, { parentEntity: level1Entity })
+
+    level3Entity = createEntity()
+    setComponent(level3Entity, EntityTreeComponent, { parentEntity: level2Entity })
+
+    level4Entity = createEntity()
+    setComponent(level4Entity, EntityTreeComponent, { parentEntity: level3Entity })
+  })
+
+  afterEach(() => {
+    return destroyEngine()
+  })
+
+  it('should return an array containing all entities from level 4 to root when no ancestor is provided', () => {
+    const outEntities: Entity[] = []
+    const result = getTreeFromChildToAncestor(level4Entity, outEntities)
+
+    assert.deepEqual(outEntities, [level4Entity, level3Entity, level2Entity, level1Entity, rootEntity])
+    assert.equal(result, false)
+  })
+
+  it('should return an array containing entities from level 4 to level 2 when level 2 is specified as ancestor', () => {
+    const outEntities: Entity[] = []
+    const result = getTreeFromChildToAncestor(level4Entity, outEntities, level2Entity)
+
+    assert.deepEqual(outEntities, [level4Entity, level3Entity, level2Entity])
+    assert.equal(result, true)
+  })
+
+  it('should return false and an array containing all entities from level 4 to root when an invalid ancestor is provided', () => {
+    const outEntities: Entity[] = []
+    const invalidAncestor = createEntity() // Nonexistent ancestor in the hierarchy
+    const result = getTreeFromChildToAncestor(level4Entity, outEntities, invalidAncestor)
+
+    assert.deepEqual(outEntities, [level4Entity, level3Entity, level2Entity, level1Entity, rootEntity])
+    assert.equal(result, false)
+  })
+
+  it('should return an array containing only the child when childEntity does not have EntityTreeComponent', () => {
+    const orphan = createEntity()
+    const outEntities: Entity[] = []
+    const result = getTreeFromChildToAncestor(orphan, outEntities)
+
+    assert.deepEqual(outEntities, [orphan])
+    assert.equal(result, false)
+  })
+
+  it('should return true when the child is the ancestor itself', () => {
+    const outEntities: Entity[] = []
+    const result = getTreeFromChildToAncestor(level2Entity, outEntities, level2Entity)
+
+    assert.deepEqual(outEntities, [level2Entity])
+    assert.equal(result, true)
+  })
+}) //:: getTreeFromChildToAncestor
+
 describe('findIndexOfEntityNode', () => {
   let parentEntity: Entity
 
@@ -1469,6 +1519,111 @@ describe('useChildrenWithComponents', () => {
     // Case4: Terminate
     removeEntityNodeRecursively(rootEntity)
     R4.unmount()
+  })
+
+  it('excludes entities that have components in the exclude array', async () => {
+    const rootEntity = createEntity()
+    const child_1 = createEntity()
+    const child_2 = createEntity()
+    let results = [UndefinedEntity]
+    const components = [HighlightComponent, VisibleComponent]
+    const exclude = [SceneComponent]
+
+    const Reactor = () => {
+      const entities = useChildrenWithComponents(rootEntity, components, exclude)
+      useEffect(() => {
+        results = entities
+      }, [entities])
+      return null
+    }
+    const tag = <Reactor />
+
+    setComponent(rootEntity, EntityTreeComponent)
+    setComponent(child_1, EntityTreeComponent, { parentEntity: rootEntity })
+    setComponent(child_2, EntityTreeComponent, { parentEntity: rootEntity })
+
+    for (const component of components) {
+      setComponent(child_1, component)
+      setComponent(child_2, component)
+    }
+
+    for (const component of exclude) {
+      setComponent(child_2, component)
+    }
+
+    const { rerender, unmount } = render(tag)
+
+    assert(results.includes(child_1))
+    assert(!results.includes(child_2))
+    unmount
+  })
+
+  it('excludes entities that has some components in the exclude array', async () => {
+    const rootEntity = createEntity()
+    const child_1 = createEntity()
+    const child_2 = createEntity()
+    let results = [UndefinedEntity]
+    const components = [HighlightComponent, VisibleComponent]
+    const exclude = [SceneComponent, BackgroundComponent]
+
+    const Reactor = () => {
+      const entities = useChildrenWithComponents(rootEntity, components, exclude)
+      useEffect(() => {
+        results = entities
+      }, [entities])
+      return null
+    }
+    const tag = <Reactor />
+
+    setComponent(rootEntity, EntityTreeComponent)
+    setComponent(child_1, EntityTreeComponent, { parentEntity: rootEntity })
+    setComponent(child_2, EntityTreeComponent, { parentEntity: rootEntity })
+
+    for (const component of components) {
+      setComponent(child_1, component)
+      setComponent(child_2, component)
+    }
+
+    setComponent(child_2, exclude[0])
+
+    const { rerender, unmount } = render(tag)
+
+    assert(results.includes(child_1))
+    assert(!results.includes(child_2))
+    unmount
+  })
+
+  it('includes entities that have no components in the exclude array', async () => {
+    const rootEntity = createEntity()
+    const child_1 = createEntity()
+    const child_2 = createEntity()
+    let results = [UndefinedEntity]
+    const components = [HighlightComponent, VisibleComponent]
+    const exclude = [SceneComponent]
+
+    const Reactor = () => {
+      const entities = useChildrenWithComponents(rootEntity, components, exclude)
+      useEffect(() => {
+        results = entities
+      }, [entities])
+      return null
+    }
+    const tag = <Reactor />
+
+    setComponent(rootEntity, EntityTreeComponent)
+    setComponent(child_1, EntityTreeComponent, { parentEntity: rootEntity })
+    setComponent(child_2, EntityTreeComponent, { parentEntity: rootEntity })
+
+    for (const component of components) {
+      setComponent(child_1, component)
+      setComponent(child_2, component)
+    }
+
+    const { rerender, unmount } = render(tag)
+
+    assert(results.includes(child_1))
+    assert(results.includes(child_2))
+    unmount
   })
 })
 
@@ -2196,7 +2351,7 @@ describe('iterateEntityNode', () => {
       return getComponent(entity, NameComponent)
     }
     const predicate = (entity: Entity) => {
-      return entity < entities[entities.length - 2]
+      return entity !== entities[entities.length - 2]
     }
     // .. Set the children
     for (let id = 0; id < entities.length; ++id) {

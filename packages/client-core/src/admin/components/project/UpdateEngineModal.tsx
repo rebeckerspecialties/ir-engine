@@ -33,9 +33,8 @@ import { useFind } from '@ir-engine/common'
 import { DefaultUpdateSchedule } from '@ir-engine/common/src/interfaces/ProjectPackageJsonType'
 import { ProjectType, ScopeType, engineSettingPath, scopePath } from '@ir-engine/common/src/schema.type.module'
 import { useHookstate, useMutableState } from '@ir-engine/hyperflux'
-import { Checkbox } from '@ir-engine/ui'
+import { Checkbox, Select } from '@ir-engine/ui'
 import Modal from '@ir-engine/ui/src/primitives/tailwind/Modal'
-import Select from '@ir-engine/ui/src/primitives/tailwind/Select'
 import Text from '@ir-engine/ui/src/primitives/tailwind/Text'
 
 import { EngineSettings } from '@ir-engine/common/src/constants/EngineSettings'
@@ -74,7 +73,7 @@ export default function UpdateEngineModal() {
 
   const scopeQuery = useFind(scopePath, {
     query: {
-      userId: Engine.instance.store.userID,
+      userId: Engine.instance.userID,
       type: 'projects:read' as ScopeType
     }
   })
@@ -178,10 +177,13 @@ export default function UpdateEngineModal() {
           <a href="/admin/settings#helm">{helmBuilder || 'Current Version'}</a>
         </Text>
         <Select
-          label={t('admin:components.project.commitData')}
+          labelProps={{
+            text: t('admin:components.project.commitData'),
+            position: 'top'
+          }}
           options={selectCommitTagOptions}
-          currentValue={selectedCommitTag.value}
-          onChange={(value) => {
+          value={selectedCommitTag.value}
+          onChange={(value: string) => {
             selectedCommitTag.set(value)
           }}
           disabled={modalProcessing.value}
