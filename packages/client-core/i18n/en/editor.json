@@ -342,7 +342,7 @@
       "lbl-mediaPreview": "Media Preview",
       "info-mediaPreview": "Preview the selected media (audio or video) source here in properties panel without spatial audio or a video texture in scene",
       "lbl-selected-source": "Source to Preview"
-    },
+      },
     "mesh": {
       "name": "Mesh",
       "description": "A mesh is a collection of vertices, edges, and faces that describe the shape of a 3D object.",
@@ -1106,8 +1106,8 @@
       "interact-message-seat": "Press E to Sit",
       "lbl-type": "Type",
       "lbl-dismount": "Dismount point, offsets this transform",
-      "lbl-force-dismount": "Force Dismount Position",
-      "lbl-force-dismount-info": "If true, the dismount position will be forced to the specified position (mid-air OK), regardless of raycast result returning a hit within 2m below dismount offset point"
+      "lbl-force-dismount" : "Force Dismount Position",
+      "lbl-force-dismount-info" : "If true, the dismount position will be forced to the specified position (mid-air OK), regardless of raycast result returning a hit within 2m below dismount offset point"
     },
     "text": {
       "name": "3D Text",
@@ -1396,7 +1396,7 @@
     "lbl-collapseAll": "Collapse All",
     "lbl-explode": "Explode Objects",
     "lbl-addEntity": "Add Entity",
-    "lbl-createPrefab": "Create Prefab",
+    "lbl-createPrefab": "Create Prefab", 
     "issues": "Issues",
     "copy-paste": {
       "no-hierarchy-nodes": "No hierarchy nodes found"
