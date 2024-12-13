@@ -322,7 +322,7 @@ export const render = (
     const state = getState(RendererState)
     if (renderer.needsResize) {
       const curPixelRatio = renderer.renderer!.getPixelRatio()
-      const scaledPixelRatio = state.renderScale
+      const scaledPixelRatio = 3 * state.renderScale
       console.log('Renderer needs re-size', { curPixelRatio, scaledPixelRatio })
       if (curPixelRatio !== scaledPixelRatio) renderer.renderer!.setPixelRatio(scaledPixelRatio)
       // TODO: Properly retrieve width and height from the canvas parent

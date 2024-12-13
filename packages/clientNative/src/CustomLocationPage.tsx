@@ -100,23 +100,6 @@ const UpdateSystem = defineSystem({
     const elapsedSeconds = getState(ECSState).elapsedSeconds;
     const transformComponent = getComponent(entity, TransformComponent);
     transformComponent.rotation.setFromAxisAngle(Vector3_Up, elapsedSeconds);
-
-    // const viewerEntity = getMutableState(EngineState).viewerEntity.value;
-    // const cameraTransform = getComponent(viewerEntity, TransformComponent);
-    // const cameraRotation = getOptionalComponent(
-    //   viewerEntity,
-    //   FollowCameraComponent,
-    // );
-    // if (cameraRotation) {
-    //   cameraTransform.rotation.setFromEuler(
-    //     new Euler(
-    //       0,
-    //       (cameraRotation.theta * Math.PI) / 180,
-    //       (cameraRotation.phi * Math.PI) / 180,
-    //     ),
-    //     true,
-    //   );
-    // }
   },
   reactor: function () {
     const viewerEntity = useMutableState(EngineState).viewerEntity.value;
@@ -143,14 +126,14 @@ const UpdateSystem = defineSystem({
       // Make the camera look at the box
       const cameraTransform = getComponent(viewerEntity, TransformComponent);
       const camera = getComponent(viewerEntity, CameraComponent);
-      cameraTransform.position.set(5, 2, 0);
+      cameraTransform.position.set(0, 2, 5);
       cameraTransform.rotation.copy(camera.quaternion);
       computeTransformMatrix(viewerEntity);
       camera.lookAt(0, 0, 0);
 
       setComponent(viewerEntity, FollowCameraComponent, {
-        targetEntity: Engine.instance.originEntity,
-        thirdPersonOffset: new Vector3(0, 1, -2),
+        targetEntity: entity,
+        thirdPersonOffset: new Vector3(0, 2, 5),
       });
 
       getMutableState(SceneState).entity.set(entity);
