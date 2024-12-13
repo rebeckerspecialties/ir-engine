@@ -23,43 +23,11 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import '@expo/browser-polyfill';
-import 'react-native-get-random-values';
-import {TextEncoder, TextDecoder} from 'text-encoding-shim';
-import structuredClone from '@ungap/structured-clone';
+import { screenshotTest } from './testUtils'
 
-globalThis.XMLSerializer = class XMLSerializer { }
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
-global.structuredClone = structuredClone;
-global.localStorage = {
-  _data: {},
-  setItem: function (id, val) {
-    return (this._data[id] = String(val));
-  },
-  getItem: function (id) {
-    return this._data.hasOwnProperty(id) ? this._data[id] : null;
-  },
-  removeItem: function (id) {
-    return delete this._data[id];
-  },
-  clear: function () {
-    return (this._data = {});
-  },
-};
-window.addEventListener = () => {};
-window.removeEventListener = () => {};
-
-// Using PixelRatio.get() was causing issues with frame buffers. Let's default to 1.
-window.devicePixelRatio = 1;
-
-document.hasFocus = () => true;
-globalThis.window.history = {
-  pushState: () => {},
-  replaceState: () => {},
-  go: () => {},
-  back: () => {},
-  forward: () => {},
-  length: 0,
-  state: null,
+const runScreenshotTest = async () => {
+  console.log('Running screenshot tests')
+  await screenshotTest('startup')
 }
+
+runScreenshotTest()
