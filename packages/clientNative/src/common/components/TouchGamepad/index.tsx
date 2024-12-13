@@ -23,30 +23,16 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Joystick} from 'react-joystick-component';
 
-import {InteractableState} from '@ir-engine/engine/src/interaction/functions/interactableFunctions';
-import {useHookstate, useMutableState} from '@ir-engine/hyperflux';
-import {isTouchAvailable} from '@ir-engine/spatial/src/common/functions/DetectFeatures';
-import {
-  AnyButton,
-  XRStandardGamepadButton,
-} from '@ir-engine/spatial/src/input/state/ButtonState';
-import {XRState, isMobileXRHeadset} from '@ir-engine/spatial/src/xr/XRState';
-import Icon from '@ir-engine/ui/src/primitives/mui/Icon';
 import {IJoystickUpdateEvent} from 'react-joystick-component/build/lib/Joystick';
+import {Button, Pressable, StyleSheet, Text, View} from 'react-native';
 
 // import {AppState} from '../../services/AppService';
 // import styles from './index.module.scss';
 
-const triggerButton = (button: AnyButton, pressed: boolean): void => {
-  const eventType = pressed ? 'touchgamepadbuttondown' : 'touchgamepadbuttonup';
-  // const event = new CustomEvent(eventType);
-  window.dispatchEvent(eventType, {});
-};
-
-const handleMove = (e: IJoystickUpdateEvent) => {
+const handleMove = (e: {x: number; y: number}) => {
   window.dispatchEvent('touchstickmove', {
     detail: {
       stick: 'LeftStick',
@@ -61,78 +47,74 @@ const handleStop = () => {
   });
 };
 
-const buttonsConfig: Array<{button: AnyButton; label: React.ReactElement}> = [
-  {
-    button: XRStandardGamepadButton.XRStandardGamepadTrigger,
-    label: <Icon type="TouchApp" />,
-  },
-];
+const moveUp = handleMove.bind(null, {x: 0, y: 1});
+const moveDown = handleMove.bind(null, {x: 0, y: -1});
+const moveLeft = handleMove.bind(null, {x: -1, y: 0});
+const moveRight = handleMove.bind(null, {x: 1, y: 0});
 
 export const TouchGamepad = () => {
-  const interactableState = useMutableState(InteractableState);
-  const availableInteractable = interactableState.available.value?.[0];
-  // const appState = useMutableState(AppState);
-
-  const isMovementControlsEnabled = XRState.useMovementControlsEnabled();
-
-  const hasGamepad = useHookstate(false);
-
-  // useEffect(() => {
-  //   const getGamepads = () => {
-  //     hasGamepad.set(!!navigator.getGamepads().filter(Boolean).length);
-  //   };
-  //   getGamepads();
-  //   window.addEventListener('gamepadconnected', getGamepads);
-  //   window.addEventListener('gamepaddisconnected', getGamepads);
-  //   return () => {
-  //     window.removeEventListener('gamepadconnected', getGamepads);
-  //     window.removeEventListener('gamepaddisconnected', getGamepads);
-  //   };
-  // }, []);
-
-  if (
-    !isMovementControlsEnabled ||
-    !isTouchAvailable ||
-    isMobileXRHeadset ||
-    // !appState.showTouchPad.value ||
-    hasGamepad.value
-  )
-    return <></>;
-
-  // const buttons = buttonsConfig.map((value, index) => {
-  //   return (
-  //     <div
-  //       key={index}
-  //       className={
-  //         styles.controllButton +
-  //         ' ' +
-  //         styles[`gamepadButton_${value.label}`] +
-  //         ' ' +
-  //         styles.availableButton
-  //       }
-  //       onPointerDown={(): void => triggerButton(value.button, true)}
-  //       onPointerUp={(): void => triggerButton(value.button, false)}>
-  //       {value.label}
-  //     </div>
-  //   );
-  // });
-
   return (
     <>
-      <div className={'stickleft'}>
-        <Joystick
-          size={100}
-          throttle={100}
-          minDistance={40}
-          move={handleMove}
-          stop={handleStop}
-          baseColor="rgba(255, 255, 255, 0.5)"
-          stickColor="rgba(255, 255, 255, 0.8)"
-        />
-      </div>
-      {/* {availableInteractable && (
-        <div className={styles.controlButtonContainer}>{buttons}</div>
-      )} */}
+      <Pressable onPressIn={moveUp} onPressOut={handleStop} style={styles.up}>
+        <Text>W</Text>
+      </Pressable>
+      <Pressable
+        onPressIn={moveLeft}
+        onPressOut={handleStop}
+        style={styles.left}>
+        <Text>A</Text>
+      </Pressable>
+      <Pressable
+        onPressIn={moveDown}
+        onPressOut={handleStop}
+        style={styles.down}>
+        <Text>S</Text>
+      </Pressable>
+      <Pressable
+        onPressIn={moveRight}
+        onPressOut={handleStop}
+        style={styles.right}>
+        <Text>D</Text>
+      </Pressable>
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  up: {
+    position: 'absolute',
+    top: 0,
+    left: 40,
+    width: 40,
+    height: 40,
+    zIndex: 2,
+    backgroundColor: 'white',
+  },
+  left: {
+    position: 'absolute',
+    top: 40,
+    left: 0,
+    width: 40,
+    height: 40,
+    zIndex: 2,
+    backgroundColor: 'white',
+  },
+  right: {
+    position: 'absolute',
+    top: 40,
+    left: 80,
+    width: 40,
+    height: 40,
+    zIndex: 2,
+    backgroundColor: 'white',
+  },
+  down: {
+    position: 'absolute',
+    top: 40,
+    left: 40,
+    width: 40,
+    height: 40,
+    zIndex: 2,
+    backgroundColor: 'white',
+  },
+});

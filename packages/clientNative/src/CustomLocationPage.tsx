@@ -69,9 +69,10 @@ import {
 import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
 import {GLView} from 'expo-gl';
 import '@ir-engine/spatial/src/input/systems/ClientInputSystem';
-import '@ir-engine/spatial/src/camera/systems/CameraOrbitSystem';
-import '@ir-engine/spatial/src/input/systems/FlyControlSystem';
-import {FlyControlComponent} from '@ir-engine/spatial/src/camera/components/FlyControlComponent';
+import '@ir-engine/spatial/src/camera/systems/FollowCameraInputSystem';
+// import '@ir-engine/spatial/src/input/systems/FlyControlSystem';
+import {FollowCameraComponent} from '@ir-engine/spatial/src/camera/components/FollowCameraComponent';
+import {TouchGamepad} from './common/components/TouchGamepad';
 
 const SceneState = defineState({
   name: 'ee.minimalist.SceneState',
@@ -121,7 +122,7 @@ const UpdateSystem = defineSystem({
       computeTransformMatrix(viewerEntity);
       camera.lookAt(0, 0, 0);
 
-      setComponent(viewerEntity, FlyControlComponent);
+      setComponent(viewerEntity, FollowCameraComponent);
 
       getMutableState(SceneState).entity.set(entity);
     }, [viewerEntity]);
@@ -157,6 +158,7 @@ export default function Template() {
   return (
     <View {...pointerEvents}>
       <GLView style={{width, height}} onContextCreate={onContextCreate} />
+      <TouchGamepad />
     </View>
   );
 }

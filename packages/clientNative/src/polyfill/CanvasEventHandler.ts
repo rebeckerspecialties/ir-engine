@@ -53,7 +53,10 @@ export function createCanvasEventHandler() {
     const listeners = listenerRegistry.get(eventType);
     if (listeners) {
       for (const listener of listeners) {
-        listener(evt.nativeEvent);
+        listener({
+          ...evt.nativeEvent,
+          type: eventType,
+        } as unknown as NativePointerEvent);
       }
     }
   };
