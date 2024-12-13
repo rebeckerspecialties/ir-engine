@@ -32,12 +32,8 @@ import {
   locationPath,
   staticResourcePath
 } from '@ir-engine/common/src/schema.type.module'
-import { useQuery } from '@ir-engine/ecs'
-import { SceneThumbnailState } from '@ir-engine/editor/src/services/SceneThumbnailState'
-import { SceneSettingsComponent } from '@ir-engine/engine/src/scene/components/SceneSettingsComponent'
-import { getMutableState, useHookstate } from '@ir-engine/hyperflux'
-import Button from '@ir-engine/ui/src/primitives/tailwind/Button'
-import Input from '@ir-engine/ui/src/primitives/tailwind/Input'
+import { useHookstate } from '@ir-engine/hyperflux'
+import { Button, Input, Select } from '@ir-engine/ui'
 import LoadingView from '@ir-engine/ui/src/primitives/tailwind/LoadingView'
 import { ModalHeader } from '@ir-engine/ui/src/primitives/tailwind/Modal'
 import Toggle from '@ir-engine/ui/src/primitives/tailwind/Toggle'
@@ -98,8 +94,6 @@ export default function AddEditLocationModal(props: {
   const audioEnabled = useHookstate<boolean>(location?.locationSetting.audioEnabled || true)
   const screenSharingEnabled = useHookstate<boolean>(location?.locationSetting.screenSharingEnabled || true)
   const locationType = useHookstate(location?.locationSetting.locationType || 'public')
-  const sceneThumbnailState = useHookstate(getMutableState(SceneThumbnailState))
-  const sceneSettingsEntities = useQuery([SceneSettingsComponent])
 
   useEffect(() => {
     if (location) {

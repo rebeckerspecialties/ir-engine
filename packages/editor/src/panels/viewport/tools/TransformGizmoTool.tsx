@@ -176,18 +176,6 @@ export default function TransformGizmoTool({
             <TbMarquee2 />
           </ToolbarButton>
         </Tooltip>
-        <Tooltip content={t('disable orbit camera and enable selection box')} position={'right center'}>
-          <Button
-            className={twMerge(
-              'rounded-none bg-[#212226] p-2 text-[#A3A3A3]',
-              isClickedSelectionBox ? 'text-white' : 'text-[#A3A3A3]', // toggle styles
-              'flex items-center justify-center rounded' // ensure proper layout and styling
-            )}
-            iconContainerClassName="m-0"
-            startIcon={<TbMarquee2 />}
-            onClick={handleClickSelectionBox}
-          />
-        </Tooltip>
       </div>
     </div>
   )
