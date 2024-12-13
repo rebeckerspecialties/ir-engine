@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/ir-engine/ir-engine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
+All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
@@ -60,14 +60,14 @@ import { useEffect } from 'react'
 import { MathUtils, Vector3 } from 'three'
 import { XruiNameplateState } from '../XruiNameplateState'
 
-const xrDistVec3 = new Vector3()
+const _vec3 = new Vector3()
 
-function updateXrDistVec3(selfAvatarEntity: Entity): void {
-  //TODO change from using rigidbody to use the transform position (+ height of avatar)
+function getSelfAvatarHeadPosition(selfAvatarEntity: Entity, vec3: Vector3): void {
   const selfAvatarRigidBodyComponent = getComponent(selfAvatarEntity, RigidBodyComponent)
+  if (!selfAvatarRigidBodyComponent) return
   const avatar = getComponent(selfAvatarEntity, AvatarComponent)
-  xrDistVec3.copy(selfAvatarRigidBodyComponent.position)
-  xrDistVec3.y += avatar.avatarHeight
+  vec3.copy(selfAvatarRigidBodyComponent.position)
+  vec3.y += avatar.avatarHeight
 }
 
 export const XruiNameplateComponent = defineComponent({
@@ -81,12 +81,10 @@ export const XruiNameplateComponent = defineComponent({
 
   reactor: () => {
     const entity = useEntityContext()
-    const selfAvatarEntity = AvatarComponent.getSelfAvatarEntity()
     const networkObject = useComponent(entity, NetworkObjectComponent)
     const user = useGet(userPath, networkObject.ownerId.value)
 
     useEffect(() => {
-      if (selfAvatarEntity === entity || getState(XruiNameplateState).isVisible === false) return //don't add nameplate to self
       const userName = user.data?.name ?? 'A User'
       addNameplateUI(entity, userName)
 
@@ -148,8 +146,12 @@ export const updateNameplateUI = (entity: Entity) => {
 
   const xruiTransform = getOptionalComponent(xruiNameplateComponent.uiEntity, TransformComponent)
   if (!xrui || !xruiTransform) return
+
   const selfAvatarEntity = AvatarComponent.getSelfAvatarEntity()
-  updateXrDistVec3(selfAvatarEntity)
+  const fromEntity = selfAvatarEntity ?? getState(EngineState).viewerEntity
+  if (!fromEntity) return
+
+  getSelfAvatarHeadPosition(fromEntity, _vec3)
 
   const hasVisibleComponent = hasComponent(xruiNameplateComponent.uiEntity, VisibleComponent)
   if (hasVisibleComponent && avatarComponent && avatarTransform) {
@@ -172,7 +174,7 @@ export const updateNameplateUI = (entity: Entity) => {
     xruiTransform.rotation.copy(cameraTransform.rotation)
   }
 
-  const distance = xrDistVec3.distanceTo(xruiTransform.position)
+  const distance = _vec3.distanceToSquared(xruiTransform.position)
 
   const transition = XruiNameplateComponent.Transitions.get(entity)
 

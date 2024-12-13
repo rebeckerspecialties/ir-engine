@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/ir-engine/ir-engine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
+All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
@@ -27,13 +27,13 @@ import { setTransformPivot, toggleTransformPivot } from '@ir-engine/editor/src/f
 import { EditorHelperState } from '@ir-engine/editor/src/services/EditorHelperState'
 import { TransformPivot } from '@ir-engine/engine/src/scene/constants/transformConstants'
 import { getMutableState, useHookstate } from '@ir-engine/hyperflux'
-import Button from '@ir-engine/ui/src/primitives/tailwind/Button'
-import Select from '@ir-engine/ui/src/primitives/tailwind/Select'
-import Tooltip from '@ir-engine/ui/src/primitives/tailwind/Tooltip'
+import { Tooltip } from '@ir-engine/ui'
+import { ViewportButton } from '@ir-engine/ui/editor'
+import { SelectionMd } from '@ir-engine/ui/src/icons'
 import { t } from 'i18next'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { FaRegDotCircle } from 'react-icons/fa'
+import ToolbarDropdown from './ToolbarDropdown'
 
 const transformPivotOptions = [
   {
@@ -69,30 +69,23 @@ const TransformPivotTool = () => {
   const editorHelperState = useHookstate(getMutableState(EditorHelperState))
 
   return (
-    <div className="flex items-center rounded bg-[#0E0F11]">
-      <Tooltip content={t('editor:toolbar.transformPivot.toggleTransformPivot')}>
-        <Button
-          startIcon={<FaRegDotCircle className="text-theme-input" />}
-          onClick={toggleTransformPivot}
-          variant="transparent"
-          className="px-0"
-          size="small"
-        />
+    <div className="flex items-center rounded bg-[#141619] p-1">
+      <Tooltip content={t('editor:toolbar.transformPivot.toggleTransformPivot')} position="bottom">
+        <ViewportButton onClick={toggleTransformPivot}>
+          <SelectionMd />
+        </ViewportButton>
       </Tooltip>
-      <Tooltip
-        content={
+      <ToolbarDropdown
+        tooltipContent={
           transformPivotOptions.find((pivot) => pivot.value === editorHelperState.transformPivot.value)?.description
         }
-        position="right center"
-      >
-        <Select
-          key={editorHelperState.transformPivot.value}
-          onChange={setTransformPivot}
-          options={transformPivotOptions}
-          value={editorHelperState.transformPivot.value}
-          width="sm"
-        />
-      </Tooltip>
+        onChange={setTransformPivot}
+        options={transformPivotOptions}
+        value={editorHelperState.transformPivot.value}
+        width="full"
+        inputHeight="xs"
+        dropdownParentClassName="w-[106px]"
+      />
     </div>
   )
 }

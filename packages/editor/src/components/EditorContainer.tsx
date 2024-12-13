@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/ir-engine/ir-engine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
+All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
@@ -48,8 +48,7 @@ import { FeatureFlags } from '@ir-engine/common/src/constants/FeatureFlags'
 import { EntityUUID } from '@ir-engine/ecs'
 import { EngineState } from '@ir-engine/spatial/src/EngineState'
 import { useSpatialEngine } from '@ir-engine/spatial/src/initializeEngine'
-import Button from '@ir-engine/ui/src/primitives/tailwind/Button'
-import Tooltip from '@ir-engine/ui/src/primitives/tailwind/Tooltip'
+import { Button, Tooltip } from '@ir-engine/ui'
 import 'rc-dock/dist/rc-dock.css'
 import { useTranslation } from 'react-i18next'
 import { IoHelpCircleOutline } from 'react-icons/io5'
@@ -264,21 +263,10 @@ const EditorContainer = () => {
       <PopupMenu />
       {!isWidgetVisible && initialized && (
         <div className="absolute bottom-3 right-4">
-          <Tooltip
-            position="left center"
-            contentStyle={{ transform: 'translate(10px)', animation: 'fadeIn 0.3s ease-in-out forwards' }}
-            key={t('editor:help')}
-            content={t('editor:help')}
-            arrow={true}
-          >
-            <Button
-              rounded="full"
-              size="small"
-              className="h-8 w-8 p-0"
-              iconContainerClassName="m-0"
-              startIcon={<IoHelpCircleOutline fontSize={24} />}
-              onClick={openChat}
-            />
+          <Tooltip position="left" key={t('editor:help')} content={t('editor:help')}>
+            <Button size="sm" className="h-8 w-8 p-0" onClick={openChat}>
+              <IoHelpCircleOutline fontSize={24} />
+            </Button>
           </Tooltip>
         </div>
       )}

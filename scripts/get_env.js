@@ -23,14 +23,17 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import Button from '@ir-engine/ui/src/primitives/tailwind/Button'
-import React from 'react'
-import { twMerge } from 'tailwind-merge'
 
-export function SidebarButton({ children, className, ...rest }) {
-  return (
-    <Button className={twMerge('bg-[#141619]', className)} {...rest}>
-      {children}
-    </Button>
-  )
-}
+const appRootPath = require('app-root-path')
+const dotenv = require('dotenv')
+dotenv.config({
+  path: appRootPath.path + '/.env.local'
+})
+const args = process.argv.slice(2)
+
+// first arg is the env variable name, second arg is the value to compare
+
+const val = process.env[args[0]] === args[1] ? 'true' : 'false'
+
+// log the value to the console
+console.log(val)

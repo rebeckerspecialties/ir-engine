@@ -342,7 +342,7 @@
       "lbl-mediaPreview": "Media Preview",
       "info-mediaPreview": "Preview the selected media (audio or video) source here in properties panel without spatial audio or a video texture in scene",
       "lbl-selected-source": "Source to Preview"
-      },
+    },
     "mesh": {
       "name": "Mesh",
       "description": "A mesh is a collection of vertices, edges, and faces that describe the shape of a 3D object.",
@@ -397,11 +397,22 @@
       "description": "An invisible box that objects will bounce off of or rest on top of.\nWithout colliders, objects will fall through floors and go through walls.",
       "lbl-isTrigger": "Trigger",
       "lbl-shape": "Shape",
+      "lbl-matchMesh": "Match Mesh",
+      "info-matchMesh": "Matches collider dimension settings to fit the mesh",
+      "lbl-warnRigidBody": "Colliders require a Rigidbody component here or on a parent object to function",
+      "lbl-addRigidBody": "Add RigidBody",
+      "lbl-colliderProps": "Collider Properties",
+      "lbl-centerOffset": "Center Offset",
+      "lbl-boxSize": "Box Size",
+      "lbl-radius": "Radius",
+      "lbl-height": "Height",
       "lbl-type": "Body Type",
       "lbl-mass": "Mass",
       "lbl-massCenter": "Mass Center",
       "lbl-friction": "Friction",
+      "info-friction": "A friction coefficient of 0 implies no friction at all (completely sliding contact) and a coefficient greater or equal to 1 implies a very strong friction. Values greater than 1 are allowed.",
       "lbl-restitution": "Restitution",
+      "info-restitution": "The bounciness of the object. 0 is no bounce, 1 is full bounce.",
       "lbl-collisionLayer": "Collision Layer",
       "lbl-collisionMask": "Collision Mask",
       "lbl-removeMesh": "Remove Mesh"
@@ -496,6 +507,10 @@
       "lbl-convertToVRM": "Force VRM",
       "lbl-isGPUInstancing": "Is Using GPU Instancing",
       "lbl-cameraOcclusion": "Occlude Camera",
+      "lbl-applyColliders": "Apply Colliders",
+      "lbl-warnRigidBody": "Colliders require a Rigidbody component here or on a parent object to function",
+      "lbl-addRigidBody": "Add RigidBody",
+      "lbl-shape": "Shape",
       "lbl-matrixAutoUpdate": "MatrixAutoUpdate",
       "lbl-name": "Name",
       "lbl-url": "Model Url",
@@ -1091,8 +1106,8 @@
       "interact-message-seat": "Press E to Sit",
       "lbl-type": "Type",
       "lbl-dismount": "Dismount point, offsets this transform",
-      "lbl-force-dismount" : "Force Dismount Position",
-      "lbl-force-dismount-info" : "If true, the dismount position will be forced to the specified position (mid-air OK), regardless of raycast result returning a hit within 2m below dismount offset point"
+      "lbl-force-dismount": "Force Dismount Position",
+      "lbl-force-dismount-info": "If true, the dismount position will be forced to the specified position (mid-air OK), regardless of raycast result returning a hit within 2m below dismount offset point"
     },
     "text": {
       "name": "3D Text",
@@ -1359,7 +1374,9 @@
       "preview": "Preview",
       "info-drag-drop": "Drag and Drop these items into the scene",
       "settings": "Settings",
-      "no-search-results": "No results found"
+      "no-search-results": "No results found",
+      "total-assets": "Showing {{total}} assets",
+      "previous": "Previous"
     }
   },
   "hierarchy": {
@@ -1379,7 +1396,7 @@
     "lbl-collapseAll": "Collapse All",
     "lbl-explode": "Explode Objects",
     "lbl-addEntity": "Add Entity",
-    "lbl-createPrefab": "Create Prefab", 
+    "lbl-createPrefab": "Create Prefab",
     "issues": "Issues",
     "copy-paste": {
       "no-hierarchy-nodes": "No hierarchy nodes found"
@@ -1452,7 +1469,7 @@
       "lbl-save-quit": "Save and Quit",
       "info-confirm": "Are you sure you want to save the scene?",
       "info-question": "Save changes to the current scene?",
-      "info-warning": "Discarted changes can not be recovered",
+      "info-warning": "Discarded changes can not be recovered",
       "info-save-success": "Scene Saved",
       "unsavedChanges": {
         "title": "Quit to Dashboard"

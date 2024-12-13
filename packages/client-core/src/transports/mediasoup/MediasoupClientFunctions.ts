@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/ir-engine/ir-engine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
+All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
@@ -43,14 +43,7 @@ import config from '@ir-engine/common/src/config'
 import { BotUserAgent } from '@ir-engine/common/src/constants/BotUserAgent'
 import { MediaStreamAppData, NetworkConnectionParams } from '@ir-engine/common/src/interfaces/NetworkInterfaces'
 import multiLogger from '@ir-engine/common/src/logger'
-import {
-  ChannelID,
-  InstanceID,
-  InviteCode,
-  LocationID,
-  RoomCode,
-  UserID
-} from '@ir-engine/common/src/schema.type.module'
+import { ChannelID, InstanceID, InviteCode, LocationID, RoomCode } from '@ir-engine/common/src/schema.type.module'
 import { getSearchParamFromURL } from '@ir-engine/common/src/utils/getSearchParamFromURL'
 import { AuthTask, ReadyTask } from '@ir-engine/common/src/world/receiveJoinWorld'
 import { Engine } from '@ir-engine/ecs/src/Engine'
@@ -71,9 +64,6 @@ import {
 } from '@ir-engine/hyperflux'
 import {
   DataChannelType,
-  MediaTagType,
-  NetworkActions,
-  NetworkPeerFunctions,
   NetworkState,
   NetworkTopics,
   addNetwork,
@@ -89,10 +79,7 @@ import {
   MediasoupDataProducerActions,
   MediasoupDataProducerConsumerState
 } from '@ir-engine/common/src/transports/mediasoup/MediasoupDataProducerConsumerState'
-import {
-  MediasoupMediaProducerActions,
-  MediasoupMediaProducerConsumerState
-} from '@ir-engine/common/src/transports/mediasoup/MediasoupMediaProducerConsumerState'
+import { MediasoupMediaProducerActions } from '@ir-engine/common/src/transports/mediasoup/MediasoupMediaProducerConsumerState'
 import {
   MediasoupTransportActions,
   MediasoupTransportObjectsState,
@@ -137,15 +124,6 @@ export const closeNetwork = (network: SocketWebRTCClientNetwork) => {
   network.primus?.removeAllListeners()
   network.primus?.end()
   removeNetwork(network)
-  /** Dispatch updatePeers locally to ensure event souce states know about this */
-  dispatchAction(
-    NetworkActions.updatePeers({
-      peers: [],
-      $to: Engine.instance.store.peerID,
-      $topic: network.topic,
-      $network: network.id
-    })
-  )
 }
 
 export const initializeNetwork = (id: InstanceID, hostPeerID: PeerID, topic: Topic, primus: Primus) => {
@@ -157,20 +135,8 @@ export const initializeNetwork = (id: InstanceID, hostPeerID: PeerID, topic: Top
     mediasoupDevice,
     primus,
     heartbeat: setInterval(() => {
-      network.messageToPeer(network.hostPeerID, [])
-    }, 1000),
-    pauseTrack: (peerID: PeerID, track: MediaTagType, pause: boolean) => {
-      const consumer = MediasoupMediaProducerConsumerState.getConsumerByPeerIdAndMediaTag(
-        network.id,
-        peerID,
-        track
-      ) as ConsumerExtension
-      if (pause) {
-        MediasoupMediaProducerConsumerState.pauseConsumer(network, consumer.id)
-      } else {
-        MediasoupMediaProducerConsumerState.resumeConsumer(network, consumer.id)
-      }
-    }
+      network.messageToPeer(network.hostPeerID!, [])
+    }, 1000)
   })
 
   return network
@@ -202,6 +168,7 @@ export const connectToInstance = (
     const token = authState.authUser.accessToken
 
     const query: NetworkConnectionParams = {
+      peerID: Engine.instance.store.peerID,
       instanceID,
       locationId: locationID,
       channelId: channelID,
@@ -432,8 +399,8 @@ export const connectToNetwork = async (
   const network = getState(NetworkState).networks[instanceID] as SocketWebRTCClientNetwork
 
   network.primus.on('data', (message) => {
-    if (!message) return
-    network.onMessage(network.hostPeerID, message)
+    if (!message || !Array.isArray(message)) return console.warn('Invalid message', message)
+    network.onMessage(network.hostPeerID!, message)
   })
 
   const message = (data) => {
@@ -453,9 +420,7 @@ export const connectToNetwork = async (
     dataProducer.send(encode([fromPeerIndex, data]))
   }
 
-  // we can assume that the host peer is always first to connect
-  NetworkPeerFunctions.createPeer(network, hostPeerID, 0, instanceID as any as UserID, 0)
-  network.peers[hostPeerID].transport = {
+  network.transports[hostPeerID] = {
     message,
     buffer
   }
