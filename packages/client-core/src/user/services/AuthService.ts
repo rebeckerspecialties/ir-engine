@@ -62,6 +62,7 @@ import {
   syncStateWithLocalStorage,
   useHookstate
 } from '@ir-engine/hyperflux'
+import { EngineState } from '@ir-engine/spatial/src/EngineState'
 import { MessageResponse } from '../../common/iframeCOM'
 // import { NotificationService } from '../../common/services/NotificationService'
 

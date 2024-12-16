@@ -235,9 +235,6 @@ export const RendererComponent = defineComponent({
         multiviewStereo: true
       }
 
-      // @ts-ignore
-      context?.__expoSetLogging(2)
-
       const renderer = new WebGLRenderer(options)
       renderer.setSize(context.drawingBufferWidth, context.drawingBufferHeight)
       rendererComponent.renderer.set(renderer)
