@@ -1,3 +1,4 @@
+$ExpoUseSources = ["expo-gl-cpp"]
 $RNFirebaseAsStaticFramework = true
 require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 # Resolve react_native_pods.rb with node to allow for hoisting

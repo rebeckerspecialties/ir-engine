@@ -207,6 +207,20 @@ export const RendererComponent = defineComponent({
 
       const canvas = rendererComponent.canvas.get(NO_PROXY) as HTMLCanvasElement
 
+      console.log({
+        width: context.drawingBufferWidth,
+        height: context.drawingBufferHeight
+      })
+
+      const inputCanvas = {
+        width: context.drawingBufferWidth,
+        height: context.drawingBufferHeight,
+        style: {},
+        addEventListener: (() => {}) as any,
+        removeEventListener: (() => {}) as any,
+        clientHeight: context.drawingBufferHeight
+      } as HTMLCanvasElement
+
       const options: WebGLRendererParameters = {
         precision: 'highp',
         powerPreference: 'high-performance',
@@ -214,7 +228,7 @@ export const RendererComponent = defineComponent({
         antialias: false,
         depth: true,
         logarithmicDepthBuffer: false,
-        canvas,
+        canvas: canvas || inputCanvas,
         context,
         preserveDrawingBuffer: false,
         //@ts-ignore
@@ -223,7 +237,6 @@ export const RendererComponent = defineComponent({
 
       const renderer = new WebGLRenderer(options)
       renderer.setSize(context.drawingBufferWidth, context.drawingBufferHeight)
-      renderer.setClearColor(0x000000)
       rendererComponent.renderer.set(renderer)
       renderer.outputColorSpace = SRGBColorSpace
 
@@ -233,6 +246,7 @@ export const RendererComponent = defineComponent({
       const renderPass = new RenderPass()
       composer.addPass(renderPass)
       rendererComponent.renderPass.set(renderPass)
+      rendererComponent.needsResize.set(true)
 
       // DISABLE THIS IF YOU ARE SEEING SHADER MISBEHAVING - UNCHECK THIS WHEN TESTING UPDATING THREEJS
       renderer.debug.checkShaderErrors = false
@@ -362,8 +376,8 @@ export const render = (
 
     if (curPixelRatio !== scaledPixelRatio) renderer.renderer!.setPixelRatio(scaledPixelRatio)
 
-    const width = canvasParent.clientWidth
-    const height = canvasParent.clientHeight
+    const width = canvasParent.width
+    const height = canvasParent.height
 
     if (camera.isPerspectiveCamera) {
       camera.aspect = width / height
@@ -396,6 +410,11 @@ export const render = (
     renderer.effectComposer.render(delta)
   }
   // context?.endFrameEXP()
+
+  // TODO: Better detect if we are runing React Native.
+  if (global.RN$Bridgeless) {
+    context.endFrameEXP()
+  }
 
   RendererComponent.activeRender = false
 }

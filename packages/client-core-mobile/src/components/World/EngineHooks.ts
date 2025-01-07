@@ -23,9 +23,26 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { useHookstate } from '@ir-engine/hyperflux'
-import { loadEngineInjection } from '@ir-engine/projects-mobile/src/loadEngineInjection'
 import { useEffect } from 'react'
+
+import multiLogger from '@ir-engine/common/src/logger'
+import { InstanceID } from '@ir-engine/common/src/schema.type.module'
+import { Engine } from '@ir-engine/ecs'
+import { addOutgoingTopicIfNecessary, getMutableState, none, useHookstate, useMutableState } from '@ir-engine/hyperflux'
+import {
+  Network,
+  NetworkPeerFunctions,
+  NetworkState,
+  NetworkTopics,
+  addNetwork,
+  createNetwork,
+  removeNetwork
+} from '@ir-engine/network'
+import { loadEngineInjection } from '@ir-engine/projects/loadEngineInjection'
+
+import { AuthState } from '@ir-engine/client-core/src/user/services/AuthService'
+
+const logger = multiLogger.child({ component: 'client-core:world' })
 
 export const useEngineInjection = () => {
   const loaded = useHookstate(false)
@@ -35,4 +52,44 @@ export const useEngineInjection = () => {
     })
   }, [])
   return loaded.value
+}
+
+export const useNetwork = (props: { online?: boolean }) => {
+  const acceptedTOS = useMutableState(AuthState).user.acceptedTOS.value
+
+  useEffect(() => {
+    getMutableState(NetworkState).config.set({
+      world: !!props.online,
+      media: !!props.online && acceptedTOS,
+      friends: !!props.online,
+      instanceID: !!props.online,
+      roomID: false
+    })
+  }, [props.online, acceptedTOS])
+
+  /** Offline/local world network */
+  useEffect(() => {
+    if (props.online) return
+
+    const userID = Engine.instance.userID
+    const peerID = Engine.instance.store.peerID
+    const userIndex = 1
+    const peerIndex = 1
+
+    const networkState = getMutableState(NetworkState)
+    networkState.hostIds.world.set(userID as any as InstanceID)
+    addNetwork(createNetwork(userID as any as InstanceID, peerID, NetworkTopics.world))
+    addOutgoingTopicIfNecessary(NetworkTopics.world)
+
+    NetworkState.worldNetworkState.ready.set(true)
+
+    NetworkPeerFunctions.createPeer(NetworkState.worldNetwork as Network, peerID, peerIndex, userID, userIndex)
+
+    const network = NetworkState.worldNetwork as Network
+
+    return () => {
+      removeNetwork(network)
+      networkState.hostIds.world.set(none)
+    }
+  }, [props.online])
 }

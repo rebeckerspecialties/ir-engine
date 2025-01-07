@@ -68,7 +68,7 @@ const server = {
 
 server.url =
   process.env.SERVER_URL ||
-  url.format(kubernetesEnabled ? { protocol: 'https', hostname: server.hostname } : { protocol: 'https', ...server })
+  url.format(kubernetesEnabled ? { protocol: 'http', hostname: server.hostname } : { protocol: 'http', ...server })
 
 export async function seed(knex: Knex): Promise<void> {
   const { testEnabled } = appConfig

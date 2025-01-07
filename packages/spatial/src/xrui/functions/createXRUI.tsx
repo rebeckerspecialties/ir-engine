@@ -24,12 +24,11 @@ Infinite Reality Engine. All Rights Reserved.
 */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
 import { Group } from 'three'
 
 import { getComponent, setComponent } from '@ir-engine/ecs/src/ComponentFunctions'
 import { Entity } from '@ir-engine/ecs/src/Entity'
-import { EntityContext, createEntity } from '@ir-engine/ecs/src/EntityFunctions'
+import { createEntity } from '@ir-engine/ecs/src/EntityFunctions'
 import { State, getState, isClient } from '@ir-engine/hyperflux'
 import { WebContainer3D } from '@ir-engine/xrui/core/three/WebContainer3D'
 import { WebLayerManager } from '@ir-engine/xrui/core/three/WebLayerManager'
@@ -43,7 +42,6 @@ import { setObjectLayers } from '../../renderer/components/ObjectLayerComponent'
 import { VisibleComponent } from '../../renderer/components/VisibleComponent'
 import { ObjectLayers } from '../../renderer/constants/ObjectLayers'
 import { DistanceFromCameraComponent } from '../../transform/components/DistanceComponents'
-import { XRUIStateContext } from '../XRUIStateContext'
 import { XRUIComponent } from '../components/XRUIComponent'
 
 export function createXRUI<S extends State<any> | null>(
@@ -58,17 +56,18 @@ export function createXRUI<S extends State<any> | null>(
   containerElement.style.position = 'fixed'
   containerElement.id = 'xrui-' + UIFunc.name
 
-  const rootElement = createRoot(containerElement!)
-  rootElement.render(
-    //@ts-ignore
-    <EntityContext.Provider value={entity}>
-      {/* 
-      // @ts-ignore */}
-      <XRUIStateContext.Provider value={state}>
-        <UIFunc />
-      </XRUIStateContext.Provider>
-    </EntityContext.Provider>
-  )
+  // TODO: We can't do this in React Native...
+  // const rootElement = createRoot(containerElement!)
+  // rootElement.render(
+  //   //@ts-ignore
+  //   <EntityContext.Provider value={entity}>
+  //     {/*
+  //     // @ts-ignore */}
+  //     <XRUIStateContext.Provider value={state}>
+  //       <UIFunc />
+  //     </XRUIStateContext.Provider>
+  //   </EntityContext.Provider>
+  // )
 
   if (!WebLayerManager.instance) {
     const viewerEntity = getState(EngineState).viewerEntity
@@ -76,6 +75,8 @@ export function createXRUI<S extends State<any> | null>(
     const gltfLoader = getState(AssetLoaderState).gltfLoader
     WebLayerManager.initialize(renderer.renderer!, gltfLoader.ktx2Loader!)
   }
+
+  return { entity: createEntity() }
 
   const container = new WebContainer3D(containerElement, { manager: WebLayerManager.instance })
 

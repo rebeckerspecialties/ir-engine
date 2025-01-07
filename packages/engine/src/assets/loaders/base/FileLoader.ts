@@ -92,7 +92,7 @@ class FileLoader<TData = unknown> extends Loader<TData> {
     })
 
     // create request
-    const req = new Request(url, {
+    const req = new Request(url.replace('https://', 'http://'), {
       headers: new Headers(this.requestHeader),
       credentials: this.withCredentials ? 'include' : 'same-origin'
       // An abort controller could be added within a future PR

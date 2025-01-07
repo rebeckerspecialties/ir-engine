@@ -26,5 +26,16 @@ Infinite Reality Engine. All Rights Reserved.
 import { loadConfigForProject } from './loadConfigForProject'
 
 export const loadEngineInjection = async () => {
-  return Promise.all([loadConfigForProject('ir-tutorial-hello')])
+  // let projects = await API.instance.service(projectsPath).find()
+  const projects = ['default-project']
+
+  const results = await Promise.all(
+    projects.map(async (project) => {
+      const projectConfig = (await loadConfigForProject(project))!
+      if (typeof projectConfig.worldInjection !== 'function') return null!
+      return (await projectConfig.worldInjection()).default?.()
+    })
+  )
+
+  return results.filter((result) => result !== null)
 }

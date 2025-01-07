@@ -69,12 +69,7 @@ async function logarithmicStateCheck(
 async function waitForClientAuthenticated(): Promise<void> {
   const api = API.instance // as FeathersClient
   console.log('Client authenticated?', api.authentication?.authenticated)
-  const result = await logarithmicStateCheck(
-    () => api.authentication?.authenticated === true,
-    Infinity,
-    1000,
-    16 * 1000
-  )
+  await logarithmicStateCheck(() => api.authentication?.authenticated === true, Infinity, 1000, 16 * 1000)
   console.log('Client authenticated?', api.authentication?.authenticated)
 }
 

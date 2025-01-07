@@ -3,7 +3,7 @@ PODS:
   - DoubleConversion (1.1.6)
   - EXConstants (17.0.3):
     - ExpoModulesCore
-  - Expo (52.0.8):
+  - Expo (52.0.14):
     - ExpoModulesCore
   - ExpoAsset (11.0.1):
     - ExpoModulesCore
@@ -16,7 +16,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - ExpoKeepAwake (14.0.1):
     - ExpoModulesCore
-  - ExpoModulesCore (2.0.4):
+  - ExpoModulesCore (2.1.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1339,7 +1339,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-draco (0.2.0):
+  - react-native-draco (0.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1893,13 +1893,13 @@ SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   EXConstants: 277129d9a42ba2cf1fad375e7eaa9939005c60be
-  Expo: 959ac1f7486354ee1d0e1c5332143b4203baf8e9
+  Expo: f67ed80510d6559419713c2a740767cb03472e97
   ExpoAsset: 6f7a8887cbb9fb39fdb0808e7f6f74ba0e1ae9b6
   ExpoFileSystem: 83da9dbce2371cc72c3a3ef49e0df54a117310f1
   ExpoFont: 12b0217e42ac97029d0f317f0486039a8508cf52
   ExpoGL: 9e4ac36b4dfeba548728f835c72fe895364ec3e7
   ExpoKeepAwake: 22173f45d767c7d37403fdf48292726901d69ce7
-  ExpoModulesCore: 539ee3e0b90372c6d6605c7e2ba88d8d8b284669
+  ExpoModulesCore: 91601cfec198cc668e6c112e9b17517f296f0421
   FBLazyVector: bc70dcb22ad30ce734a7cce7210791dc737e230f
   Firebase: 7a56fe4f56b5ab81b86a6822f5b8f909ae6fc7e2
   FirebaseCore: 93abc05437f8064cd2bc0a53b768fb0bc5a1d006
@@ -1946,7 +1946,7 @@ SPEC CHECKSUMS:
   React-logger: addd140841248966c2547eb94836399cc1061f4d
   React-Mapbuffer: 1bc8e611871f4965dac0bc47a4561421a6e20f69
   React-microtasksnativemodule: cff02bc87f8a1d5b9985c1c92ea8e84e854229d9
-  react-native-draco: e22eac0b4b9b5156b39eeaeb53aa518e6b2d1197
+  react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   React-nativeconfig: 7f8cd6cae21f8bb18c53b746c495e72795fc5cb0
   React-NativeModulesApple: 3210b7177c11145bb8e0d6f24aae102a221c4ddc
@@ -1978,8 +1978,8 @@ SPEC CHECKSUMS:
   RNFBApp: 72b96921c64702d51eca9f3ed579c1777efd0d7e
   RNFBCrashlytics: 22223ee96beba1130c8906253f5b900f629c2926
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Yoga: b31c16dc8150acf90019a65ce2da4b47fab913cb
+  Yoga: 513b871d622689bd53b51481bbcfb6b8f1a3de5b
 
-PODFILE CHECKSUM: 8ca87810585fb6e9d250f0ed1444108329a5a311
+PODFILE CHECKSUM: 8bbb9ee26c0034dd601d94c137a968f3e9b5c0fe
 
 COCOAPODS: 1.15.2
