@@ -36,6 +36,8 @@ import {
   PresentationSystemGroup,
   SimulationSystemGroup
 } from './SystemGroups'
+
+import { applyIncomingActions } from '@ir-engine/hyperflux'
 import { nowMilliseconds } from './Timer'
 
 const TimerConfig = {
@@ -64,6 +66,11 @@ export const executeSystems = (elapsedTime: number) => {
   executeFixedSystem(SimulationSystemGroup)
   executeSystem(AnimationSystemGroup)
   executeSystem(PresentationSystemGroup)
+  // TODO: SETTING THIS FIXED EVERYTHING, but tehcnically this should be handled by
+  // the IncmmingActionSystem
+  if (incomingActions.length > 0) {
+    applyIncomingActions()
+  }
 
   const end = nowMilliseconds()
   const duration = end - start

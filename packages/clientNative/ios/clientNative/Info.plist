@@ -27,10 +27,18 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+  <key>NSExceptionDomains</key>
+      <dict>
+          <key>localhost</key>
+          <dict>
+              <key>NSExceptionAllowsInsecureHTTPLoads</key>
+              <true/>
+          </dict>
+      </dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>

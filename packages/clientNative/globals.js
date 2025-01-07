@@ -23,9 +23,12 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
+import '@expo/browser-polyfill';
 import 'react-native-get-random-values';
 import {TextEncoder, TextDecoder} from 'text-encoding-shim';
 import structuredClone from '@ungap/structured-clone';
+
+globalThis.XMLSerializer = class XMLSerializer { }
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 global.structuredClone = structuredClone;
@@ -46,3 +49,17 @@ global.localStorage = {
 };
 window.addEventListener = () => {};
 window.removeEventListener = () => {};
+
+// Using PixelRatio.get() was causing issues with frame buffers. Let's default to 1.
+window.devicePixelRatio = 1;
+
+document.hasFocus = () => true;
+globalThis.window.history = {
+  pushState: () => {},
+  replaceState: () => {},
+  go: () => {},
+  back: () => {},
+  forward: () => {},
+  length: 0,
+  state: null,
+}

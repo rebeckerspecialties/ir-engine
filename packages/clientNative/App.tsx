@@ -30,15 +30,65 @@ Infinite Reality Engine. All Rights Reserved.
  * @format
  */
 
-import React from 'react';
-import {SafeAreaView, View} from 'react-native';
+// import { createHyperStore } from '@ir-engine/hyperflux'
+// createHyperStore()
+import React, {Suspense, lazy, useEffect} from 'react';
+import {SafeAreaView, View, Text} from 'react-native';
 import LocationRoutes from './src/pages/location/location';
+import waitForClientAuthenticated from '@ir-engine/client-core/src/util/wait-for-client-authenticated';
+import {pipeLogs} from '@ir-engine/common/src/logger';
+import {API} from '@ir-engine/common';
+import {API as ClientAPI} from '@ir-engine/client-core/src/API';
+import {createHyperStore, getMutableState} from '@ir-engine/hyperflux';
+import {DomainConfigState} from '@ir-engine/engine/src/assets/state/DomainConfigState';
+import config from '@ir-engine/common/src/config';
+import {useAuthenticated} from '@ir-engine/client-core/src/user/services/AuthService';
+
+const authenticate = async () => {
+  await waitForClientAuthenticated();
+};
+
+const initializeLogs = async () => {
+  pipeLogs(API.instance);
+};
+
+createHyperStore();
+ClientAPI.createAPI('/location/sky-station');
+
+const publicDomain = 'https://localhost:8081';
+
+getMutableState(DomainConfigState).merge({
+  publicDomain,
+  cloudDomain: config.client.fileServer,
+  proxyDomain: config.client.cors.proxyUrl,
+});
+
+// const CustomLoadingPage = lazy(() => import('./src/CustomLocationPage'));
+const LocationPage = lazy(() => import('./src/pages/location/LocationPage'));
 
 function App(): React.JSX.Element {
+  useEffect(() => {
+    authenticate().then(() => {
+      initializeLogs();
+      console.log('Authenticated');
+    });
+  }, []);
+
+  useEffect(() => {
+    waitForClientAuthenticated().then(() => {
+      console.log('Authenticated');
+    });
+  });
+
+  const isLoggedIn = useAuthenticated();
+  console.log('isLoggedIn', isLoggedIn);
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <View>
-        <LocationRoutes />
+        <Suspense fallback={null}>
+          <LocationPage />
+        </Suspense>
       </View>
     </SafeAreaView>
   );

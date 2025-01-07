@@ -926,7 +926,7 @@ const useLoadImageSource = (
       }
     }
 
-    if (bufferViewSourceURI) {
+    if (bufferViewSourceURI && !global.RN$Bridgeless) {
       isObjectURL = true
       const blob = new Blob([bufferViewSourceURI], { type: sourceDef.mimeType })
       const url = URL.createObjectURL(blob)

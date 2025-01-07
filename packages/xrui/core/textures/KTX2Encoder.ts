@@ -23,13 +23,10 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { createWorkerFromCrossOriginURL } from '@ir-engine/spatial/src/common/functions/createWorkerFromCrossOriginURL'
-
-import { isClient } from '@ir-engine/hyperflux'
 import { WorkerPool } from '../WorkerPool'
 
 // @ts-ignore
-const workerPath = isClient ? '' : ''
+// const workerPath = isClient ? new URL('./KTX2Worker.bundle.js', import.meta.url).href : ''
 
 export enum UASTCFlags {
   /** Fastest is the lowest quality, although it's stil substantially higher quality vs. BC1/ETC1. It supports 5 modes.
@@ -143,7 +140,7 @@ export class KTX2Encoder {
   pool = new WorkerPool(1)
 
   constructor() {
-    this.pool.setWorkerCreator(() => createWorkerFromCrossOriginURL(workerPath, false, { name: 'KTX2 Encoder' }))
+    // this.pool.setWorkerCreator(() => createWorkerFromCrossOriginURL(workerPath, false, { name: 'KTX2 Encoder' }))
   }
 
   setWorkerLimit(limit: number) {

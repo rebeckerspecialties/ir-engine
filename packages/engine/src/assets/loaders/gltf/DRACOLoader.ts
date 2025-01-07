@@ -1,3 +1,5 @@
+// @ts-nocheck - This file is not yet converted to TypeScript
+
 /*
 CPAL-1.0 License
 
@@ -333,9 +335,9 @@ class DRACOLoader extends Loader {
    * @return {Promise<{decoder: DracoDecoderModule}>}
    */
   getDecoderModule() {
-    var scope = this
-    var config = {}
-    var promise = this.decoderModulePromise
+    const scope = this
+    const config = {}
+    let promise = this.decoderModulePromise
 
     if (promise) return promise
 
@@ -378,9 +380,9 @@ class DRACOLoader extends Loader {
    * @return {Promise<{decoder: DracoDecoderModule}>}
    */
   getEncoderModule() {
-    var scope = this
-    var config = {}
-    var promise = this.decoderModulePromise
+    const scope = this
+    const config = {}
+    let promise = this.decoderModulePromise
 
     if (promise) return promise
 
@@ -412,12 +414,12 @@ class DRACOLoader extends Loader {
    * @return {Promise}
    */
   _loadScript(src, script_id) {
-    var prevScript = document.getElementById(script_id)
+    const prevScript = document.getElementById(script_id)
     if (prevScript !== null) {
       prevScript.parentNode.removeChild(prevScript)
     }
-    var head = document.getElementsByTagName('head')[0]
-    var script = document.createElement('script')
+    const head = document.getElementsByTagName('head')[0]
+    const script = document.createElement('script')
     script.id = script_id
     script.type = 'text/javascript'
     script.src = src
@@ -446,7 +448,7 @@ function DRACOWorker() {
             resolve({ draco: draco })
           }
 
-          DracoDecoderModule(decoderConfig) // eslint-disable-line no-undef
+          DracoDecoderModule(decoderConfig)
         })
         break
 

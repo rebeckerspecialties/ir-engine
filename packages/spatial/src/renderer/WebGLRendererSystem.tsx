@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/ir-engine/ir-engine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023 
+All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
@@ -82,6 +82,11 @@ declare module 'postprocessing' {
   }
 }
 
+export interface ExpoWebGLRenderingContext extends WebGL2RenderingContext {
+  contextId: number
+  endFrameEXP(): void
+  flushEXP(): void
+}
 export const EffectSchema = S.Union([S.Any(), S.Type<Effect>(undefined, { isActive: S.Bool() })])
 
 export const RendererComponent = defineComponent({
@@ -202,6 +207,20 @@ export const RendererComponent = defineComponent({
 
       const canvas = rendererComponent.canvas.get(NO_PROXY) as HTMLCanvasElement
 
+      console.log({
+        width: context.drawingBufferWidth,
+        height: context.drawingBufferHeight
+      })
+
+      const inputCanvas = {
+        width: context.drawingBufferWidth,
+        height: context.drawingBufferHeight,
+        style: {},
+        addEventListener: (() => {}) as any,
+        removeEventListener: (() => {}) as any,
+        clientHeight: context.drawingBufferHeight
+      } as HTMLCanvasElement
+
       const options: WebGLRendererParameters = {
         precision: 'highp',
         powerPreference: 'high-performance',
@@ -209,7 +228,7 @@ export const RendererComponent = defineComponent({
         antialias: false,
         depth: true,
         logarithmicDepthBuffer: false,
-        canvas,
+        canvas: canvas || inputCanvas,
         context,
         preserveDrawingBuffer: false,
         //@ts-ignore
@@ -217,14 +236,17 @@ export const RendererComponent = defineComponent({
       }
 
       const renderer = new WebGLRenderer(options)
+      renderer.setSize(context.drawingBufferWidth, context.drawingBufferHeight)
       rendererComponent.renderer.set(renderer)
       renderer.outputColorSpace = SRGBColorSpace
 
       const composer = new EffectComposer(renderer)
+      composer.setSize(context.drawingBufferWidth, context.drawingBufferHeight)
       rendererComponent.effectComposer.set(composer)
       const renderPass = new RenderPass()
       composer.addPass(renderPass)
       rendererComponent.renderPass.set(renderPass)
+      rendererComponent.needsResize.set(true)
 
       // DISABLE THIS IF YOU ARE SEEING SHADER MISBEHAVING - UNCHECK THIS WHEN TESTING UPDATING THREEJS
       renderer.debug.checkShaderErrors = false
@@ -243,6 +265,7 @@ export const RendererComponent = defineComponent({
       canvas.style.touchAction = 'none'
       canvas.addEventListener('resize', onResize, false)
       window.addEventListener('resize', onResize, false)
+      rendererComponent.needsResize.set(true)
 
       renderer.autoClear = true
 
@@ -308,7 +331,7 @@ export const render = (
 ) => {
   const xrFrame = getState(XRState).xrFrame
 
-  const canvasParent = renderer.canvas!.parentElement
+  const canvasParent = renderer.canvas
   if (!canvasParent) return
 
   const state = getState(RendererState)
@@ -319,8 +342,8 @@ export const render = (
 
     if (curPixelRatio !== scaledPixelRatio) renderer.renderer!.setPixelRatio(scaledPixelRatio)
 
-    const width = canvasParent.clientWidth
-    const height = canvasParent.clientHeight
+    const width = canvasParent.width
+    const height = canvasParent.height
 
     if (camera.isPerspectiveCamera) {
       camera.aspect = width / height
@@ -341,6 +364,8 @@ export const render = (
   RendererComponent.activeRender = true
 
   /** Postprocessing does not support multipass yet, so just use basic renderer when in VR */
+  const context = renderer.renderContext as ExpoWebGLRenderingContext
+  camera.aspect = context.drawingBufferWidth / context.drawingBufferHeight
   if (xrFrame || !effectComposer || !renderer.effectComposer) {
     for (const c of camera.cameras) c.layers.mask = camera.layers.mask
     renderer.renderer!.clear()
@@ -349,6 +374,11 @@ export const render = (
     renderer.effectComposer.setMainScene(scene)
     renderer.effectComposer.setMainCamera(camera)
     renderer.effectComposer.render(delta)
+  }
+
+  // TODO: Better detect if we are runing React Native.
+  if (global.RN$Bridgeless) {
+    context.endFrameEXP()
   }
 
   RendererComponent.activeRender = false
