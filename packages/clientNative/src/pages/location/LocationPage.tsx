@@ -36,15 +36,18 @@ import {
 import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
 
 import '../../engine';
+import {createCanvasEventHandler} from '../../polyfill/CanvasEventHandler';
 
 const {width, height} = Dimensions.get('window');
+
+const {eventListenerRegistry, pointerEvents} = createCanvasEventHandler();
 
 const LocationRoutes = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
   const onContextCreate = useCallback(
     (context: NativeWebGLRenderingContext) => {
-      setCanvas(new NativeHTMLCanvasElement(context));
+      setCanvas(new NativeHTMLCanvasElement(context, eventListenerRegistry));
     },
     [],
   );
