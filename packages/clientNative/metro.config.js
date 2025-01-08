@@ -69,6 +69,15 @@ module.exports = makeMetroConfig({
         };
       }
       if (
+        moduleName.startsWith('@ir-engine/editor') ||
+        moduleName.startsWith('@ir-engine/visual-script')
+      ) {
+        return {
+          filePath: path.resolve(__dirname, `./css.js`),
+          type: 'sourceFile',
+        };
+      }
+      if (
         moduleName.endsWith('.css') ||
         moduleName.endsWith('.scss') ||
         moduleName.endsWith('.sass') ||
