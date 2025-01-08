@@ -38,15 +38,18 @@ const packages = [
   'network',
   'spatial',
   'ui',
-  'xrui'
+  'xrui',
 ];
 
 const generateAliases = () => {
   // Generate aliases for all packages
-  return packages.reduce((aliases, pkg) => ({
-    ...aliases,
-    [`@ir-engine/${pkg}/*`]: path.resolve(rootDir, `packages/${pkg}/src/*`)
-  }), {});
+  return packages.reduce(
+    (aliases, pkg) => ({
+      ...aliases,
+      [`@ir-engine/${pkg}/*`]: path.resolve(rootDir, `packages/${pkg}/src/*`),
+    }),
+    {},
+  );
 };
 
 module.exports = {
@@ -56,16 +59,19 @@ module.exports = {
       'module-resolver',
       {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
-        alias: generateAliases()
+        alias: generateAliases(),
       },
     ],
-    ["module:react-native-dotenv", {
-      "envName": "@env",
-      "moduleName": "@env",
-      "path": "../../.env.local",
-      "safe": false,
-      "allowUndefined": true,
-      "verbose": false
-    }]
+    [
+      'module:react-native-dotenv',
+      {
+        envName: '@env',
+        moduleName: '@env',
+        path: '../../.env.local',
+        safe: false,
+        allowUndefined: true,
+        verbose: false,
+      },
+    ],
   ],
 };

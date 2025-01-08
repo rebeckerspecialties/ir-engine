@@ -59,15 +59,6 @@ module.exports = makeMetroConfig({
           type: 'sourceFile',
         };
       }
-      if (moduleName.startsWith('react-icons')) {
-        return {
-          filePath: path.resolve(
-            __dirname,
-            `../client-core/node_modules/${moduleName}/index.js`,
-          ),
-          type: 'sourceFile',
-        };
-      }
       if (
         moduleName.startsWith('@ir-engine/editor') ||
         moduleName.startsWith('@ir-engine/visual-script')
