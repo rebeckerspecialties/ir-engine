@@ -25,6 +25,11 @@ Infinite Reality Engine. All Rights Reserved.
 
 const path = require('path');
 const {makeMetroConfig} = require('@rnx-kit/metro-config');
+const {getDefaultConfig} = require('@react-native/metro-config');
+
+const defaultConfig = getDefaultConfig(__dirname);
+const {sourceExts} = defaultConfig.resolver;
+
 module.exports = makeMetroConfig({
   transformer: {
     getTransformOptions: async () => ({
@@ -54,10 +59,37 @@ module.exports = makeMetroConfig({
           type: 'sourceFile',
         };
       }
+      if (moduleName.startsWith('react-icons')) {
+        return {
+          filePath: path.resolve(
+            __dirname,
+            `../client-core/node_modules/${moduleName}/index.js`,
+          ),
+          type: 'sourceFile',
+        };
+      }
+      if (
+        moduleName.endsWith('.css') ||
+        moduleName.endsWith('.scss') ||
+        moduleName.endsWith('.sass') ||
+        moduleName.endsWith('scss?inline') ||
+        moduleName.endsWith('svg?react')
+      ) {
+        return {
+          filePath: path.resolve(__dirname, './css.js'),
+          type: 'sourceFile',
+        };
+      }
       return context.resolveRequest(context, moduleName, platform);
     },
+    sourceExts: [
+      ...sourceExts,
+      'scss',
+      'sass',
+      'css',
+      'scss?inline',
+      'svg?react',
+    ],
   },
-  watchFolders: [
-    path.resolve(__dirname, '../..'),
-  ],
+  watchFolders: [path.resolve(__dirname, '../..')],
 });
