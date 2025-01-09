@@ -52,26 +52,29 @@ const generateAliases = () => {
   );
 };
 
-module.exports = {
-  presets: ['module:@react-native/babel-preset'],
-  plugins: [
-    [
-      'module-resolver',
-      {
-        extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
-        alias: generateAliases(),
-      },
+module.exports = function (api) {
+  api.cache(false);
+  return {
+    presets: ['module:@react-native/babel-preset'],
+    plugins: [
+      [
+        'module-resolver',
+        {
+          extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+          alias: generateAliases(),
+        },
+      ],
+      [
+        'module:react-native-dotenv',
+        {
+          envName: '@env',
+          moduleName: '@env',
+          path: '../../.env.local',
+          safe: false,
+          allowUndefined: true,
+          verbose: false,
+        },
+      ],
     ],
-    [
-      'module:react-native-dotenv',
-      {
-        envName: '@env',
-        moduleName: '@env',
-        path: '../../.env.local',
-        safe: false,
-        allowUndefined: true,
-        verbose: false,
-      },
-    ],
-  ],
+  };
 };
