@@ -329,40 +329,6 @@ export const render = (
   delta: number,
   effectComposer = true
 ) => {
-  const isReactNative = global.RN$Bridgeless
-  if (isReactNative) {
-    const canvasParent = renderer.canvas
-    if (!canvasParent) return
-    const state = getState(RendererState)
-    if (renderer.needsResize) {
-      const curPixelRatio = renderer.renderer!.getPixelRatio()
-      const scaledPixelRatio = 3 * state.renderScale
-      console.log('Renderer needs re-size', { curPixelRatio, scaledPixelRatio })
-      if (curPixelRatio !== scaledPixelRatio) renderer.renderer!.setPixelRatio(scaledPixelRatio)
-      // TODO: Properly retrieve width and height from the canvas parent
-      const width = 402
-      const height = 874
-      if (camera.isPerspectiveCamera) {
-        camera.aspect = width / height
-        camera.updateProjectionMatrix()
-      }
-      state.useShadows && renderer.csm?.updateFrustums()
-      renderer.renderer!.setSize(width, height, true)
-      renderer.needsResize = false
-    }
-    RendererComponent.activeRender = true
-    const context = renderer.renderContext as ExpoWebGLRenderingContext
-    // camera.aspect = context.drawingBufferWidth / context.drawingBufferHeight
-    // Use Basic rendering on React Native for now as postprocessing causes issues with frambuffers.
-    //
-    for (const c of camera.cameras) c.layers.mask = camera.layers.mask
-    renderer.renderer!.clear()
-    renderer.renderer!.render(scene, camera)
-    context.endFrameEXP()
-    RendererComponent.activeRender = false
-    return
-  }
-
   const xrFrame = getState(XRState).xrFrame
 
   const canvasParent = renderer.canvas
@@ -409,7 +375,6 @@ export const render = (
     renderer.effectComposer.setMainCamera(camera)
     renderer.effectComposer.render(delta)
   }
-  // context?.endFrameEXP()
 
   // TODO: Better detect if we are runing React Native.
   if (global.RN$Bridgeless) {
