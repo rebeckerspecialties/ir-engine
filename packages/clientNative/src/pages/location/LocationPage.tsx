@@ -37,6 +37,7 @@ import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
 
 import '../../engine';
 import {createCanvasEventHandler} from '../../polyfill/CanvasEventHandler';
+import {TouchGamepad} from '../../common/components/TouchGamepad';
 
 const {width, height} = Dimensions.get('window');
 
@@ -73,6 +74,7 @@ const LocationRoutes = () => {
         }}
       />
       <GLView style={{width, height}} onContextCreate={onContextCreate} />
+      <TouchGamepad />
     </View>
   );
 };
