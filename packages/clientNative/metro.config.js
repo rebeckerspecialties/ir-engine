@@ -59,6 +59,13 @@ module.exports = makeMetroConfig({
           type: 'sourceFile',
         };
       }
+      if (moduleName === 'crypto') {
+        return context.resolveRequest(
+          context,
+          'react-native-quick-crypto',
+          platform,
+        );
+      }
       if (
         moduleName.startsWith('@ir-engine/editor') ||
         moduleName.startsWith('@ir-engine/visual-script')

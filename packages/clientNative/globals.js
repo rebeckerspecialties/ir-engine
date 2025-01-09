@@ -28,7 +28,7 @@ import 'react-native-get-random-values';
 import {TextEncoder, TextDecoder} from 'text-encoding-shim';
 import structuredClone from '@ungap/structured-clone';
 
-globalThis.XMLSerializer = class XMLSerializer {};
+globalThis.XMLSerializer = class XMLSerializer { }
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 global.structuredClone = structuredClone;
@@ -62,4 +62,4 @@ globalThis.window.history = {
   forward: () => {},
   length: 0,
   state: null,
-};
+}
