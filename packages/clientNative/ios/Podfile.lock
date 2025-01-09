@@ -1363,7 +1363,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-draco (0.2.0):
+  - react-native-draco (0.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2002,7 +2002,7 @@ SPEC CHECKSUMS:
   React-logger: addd140841248966c2547eb94836399cc1061f4d
   React-Mapbuffer: 1bc8e611871f4965dac0bc47a4561421a6e20f69
   React-microtasksnativemodule: cff02bc87f8a1d5b9985c1c92ea8e84e854229d9
-  react-native-draco: e22eac0b4b9b5156b39eeaeb53aa518e6b2d1197
+  react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
   React-nativeconfig: 7f8cd6cae21f8bb18c53b746c495e72795fc5cb0

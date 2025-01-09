@@ -63,7 +63,6 @@ getMutableState(DomainConfigState).merge({
   proxyDomain: config.client.cors.proxyUrl,
 });
 
-// const CustomLoadingPage = lazy(() => import('./src/CustomLocationPage'));
 const LocationPage = lazy(() => import('./src/pages/location/LocationPage'));
 
 function App(): React.JSX.Element {

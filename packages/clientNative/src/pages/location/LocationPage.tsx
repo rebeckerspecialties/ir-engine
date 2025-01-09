@@ -66,7 +66,7 @@ const LocationRoutes = () => {
   }
 
   return (
-    <View>
+    <View {...pointerEvents}>
       <LocationPage
         params={{
           locationName: 'sky-station',
