@@ -3,7 +3,7 @@ PODS:
   - DoubleConversion (1.1.6)
   - EXConstants (17.0.3):
     - ExpoModulesCore
-  - Expo (52.0.14):
+  - Expo (52.0.8):
     - ExpoModulesCore
   - ExpoAsset (11.0.1):
     - ExpoModulesCore
@@ -16,7 +16,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - ExpoKeepAwake (14.0.1):
     - ExpoModulesCore
-  - ExpoModulesCore (2.1.1):
+  - ExpoModulesCore (2.0.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -101,6 +101,30 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - NitroModules (0.20.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - OpenSSL-Universal (3.3.2000)
   - PromisesObjC (2.4.0)
   - PromisesSwift (2.4.0):
     - PromisesObjC (= 2.4.0)
@@ -1362,6 +1386,29 @@ PODS:
     - Yoga
   - react-native-get-random-values (1.11.0):
     - React-Core
+  - react-native-quick-crypto (0.7.11):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - OpenSSL-Universal
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - React-nativeconfig (0.76.2)
   - React-NativeModulesApple (0.76.2):
     - glog
@@ -1655,6 +1702,7 @@ DEPENDENCIES:
   - fmt (from `../../../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - NitroModules (from `../../../node_modules/react-native-nitro-modules`)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../../../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -1688,6 +1736,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-draco (from `../../../node_modules/@callstack/react-native-draco`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
+  - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1732,6 +1781,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
+    - OpenSSL-Universal
     - PromisesObjC
     - PromisesSwift
     - SocketRocket
@@ -1766,6 +1816,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2024-11-12-RNv0.76.2-5b4aa20c719830dcf5684832b89a6edb95ac3d64
+  NitroModules:
+    :path: "../../../node_modules/react-native-nitro-modules"
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -1828,6 +1880,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@callstack/react-native-draco"
   react-native-get-random-values:
     :path: "../../../node_modules/react-native-get-random-values"
+  react-native-quick-crypto:
+    :path: "../../../node_modules/react-native-quick-crypto"
   React-nativeconfig:
     :path: "../../../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1893,13 +1947,13 @@ SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   EXConstants: 277129d9a42ba2cf1fad375e7eaa9939005c60be
-  Expo: f67ed80510d6559419713c2a740767cb03472e97
+  Expo: 959ac1f7486354ee1d0e1c5332143b4203baf8e9
   ExpoAsset: 6f7a8887cbb9fb39fdb0808e7f6f74ba0e1ae9b6
   ExpoFileSystem: 83da9dbce2371cc72c3a3ef49e0df54a117310f1
   ExpoFont: 12b0217e42ac97029d0f317f0486039a8508cf52
   ExpoGL: 9e4ac36b4dfeba548728f835c72fe895364ec3e7
   ExpoKeepAwake: 22173f45d767c7d37403fdf48292726901d69ce7
-  ExpoModulesCore: 91601cfec198cc668e6c112e9b17517f296f0421
+  ExpoModulesCore: 539ee3e0b90372c6d6605c7e2ba88d8d8b284669
   FBLazyVector: bc70dcb22ad30ce734a7cce7210791dc737e230f
   Firebase: 7a56fe4f56b5ab81b86a6822f5b8f909ae6fc7e2
   FirebaseCore: 93abc05437f8064cd2bc0a53b768fb0bc5a1d006
@@ -1915,6 +1969,8 @@ SPEC CHECKSUMS:
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   hermes-engine: 3852e37f6158a2fcfad23e31215ed495da3a6a40
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  NitroModules: 51ceb94960a4a40d4fcd90a2815a577d70a05447
+  OpenSSL-Universal: b60a3702c9fea8b3145549d421fdb018e53ab7b4
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   RCT-Folly: 84578c8756030547307e4572ab1947de1685c599
@@ -1948,6 +2004,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: cff02bc87f8a1d5b9985c1c92ea8e84e854229d9
   react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
+  react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
   React-nativeconfig: 7f8cd6cae21f8bb18c53b746c495e72795fc5cb0
   React-NativeModulesApple: 3210b7177c11145bb8e0d6f24aae102a221c4ddc
   React-perflogger: c8860eaab4fe60d628b27bf0086a372c429fc74f
@@ -1978,7 +2035,7 @@ SPEC CHECKSUMS:
   RNFBApp: 72b96921c64702d51eca9f3ed579c1777efd0d7e
   RNFBCrashlytics: 22223ee96beba1130c8906253f5b900f629c2926
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Yoga: 513b871d622689bd53b51481bbcfb6b8f1a3de5b
+  Yoga: b31c16dc8150acf90019a65ce2da4b47fab913cb
 
 PODFILE CHECKSUM: 8bbb9ee26c0034dd601d94c137a968f3e9b5c0fe
 
