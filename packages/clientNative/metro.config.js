@@ -71,7 +71,7 @@ module.exports = makeMetroConfig({
         moduleName.startsWith('@ir-engine/visual-script')
       ) {
         return {
-          filePath: path.resolve(__dirname, `./css.js`),
+          filePath: path.resolve(__dirname, `./emptyPolyfill.js`),
           type: 'sourceFile',
         };
       }
@@ -83,7 +83,7 @@ module.exports = makeMetroConfig({
         moduleName.endsWith('svg?react')
       ) {
         return {
-          filePath: path.resolve(__dirname, './css.js'),
+          filePath: path.resolve(__dirname, './emptyPolyfill.js'),
           type: 'sourceFile',
         };
       }
