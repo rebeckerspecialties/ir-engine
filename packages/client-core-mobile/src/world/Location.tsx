@@ -29,6 +29,8 @@ import { AuthService } from '@ir-engine/client-core/src/user/services/AuthServic
 import multiLogger from '@ir-engine/common/src/logger'
 import { useLoadScene } from '../components/World/LoadLocationScene'
 
+import '@ir-engine/client-core/src/world/LocationModule'
+
 import { clientContextParams } from '@ir-engine/client-core/src/util/ClientContextState'
 
 const logger = multiLogger.child({ component: 'system:location', modifier: clientContextParams })
