@@ -30,7 +30,6 @@ const rootDir = path.resolve(__dirname, '../..');
 const packages = [
   'hyperflux',
   'projects',
-  'projects-mobile',
   'common',
   'ecs',
   'engine',
