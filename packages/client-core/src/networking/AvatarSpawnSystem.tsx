@@ -25,7 +25,6 @@ Infinite Reality Engine. All Rights Reserved.
 
 import React, { useEffect } from 'react'
 
-import { getSearchParamFromURL } from '@ir-engine/common/src/utils/getSearchParamFromURL'
 import { spawnLocalAvatarInWorld } from '@ir-engine/common/src/world/receiveJoinWorld'
 import {
   defineSystem,
@@ -75,7 +74,10 @@ export const AvatarSpawnReactor = (props: { sceneEntity: Entity }) => {
 
   useImmediateEffect(() => {
     const sceneSettingsSpectateEntity = getOptionalComponent(settingsQuery[0], SceneSettingsComponent)?.spectateEntity
-    spectateEntity.set(sceneSettingsSpectateEntity || (getSearchParamFromURL('spectate') as EntityUUID))
+    // spectateEntity.set(sceneSettingsSpectateEntity || (getSearchParamFromURL('spectate') as EntityUUID))
+    if (sceneSettingsSpectateEntity) {
+      spectateEntity.set(sceneSettingsSpectateEntity)
+    }
   }, [settingsQuery[0], searchParams.value['spectate']])
 
   const isSpectating = typeof spectateEntity.value === 'string'
