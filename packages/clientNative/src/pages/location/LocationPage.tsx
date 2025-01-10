@@ -23,8 +23,8 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import {useEngineInjection} from '@ir-engine/client-core-mobile/src/components/World/EngineHooks';
-import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
+import {useEngineInjection} from '@ir-engine/client-core/src/components/World/EngineHooks';
+import {useEngineCanvas} from '@ir-engine/client-core/src/hooks/useEngineCanvas';
 import {useSpatialEngine} from '@ir-engine/spatial/src/initializeEngine';
 import {GLView} from 'expo-gl';
 import {useCallback, useState} from 'react';
@@ -33,7 +33,7 @@ import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
 } from '../../polyfill/NativeHTMLCanvasElement';
-import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
+import LocationPage from '@ir-engine/client-core/src/world/Location';
 
 import '../../engine';
 
