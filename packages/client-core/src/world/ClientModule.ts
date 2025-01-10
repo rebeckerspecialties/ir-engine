@@ -27,7 +27,7 @@ import { WidgetAppServiceReceptorSystem } from '@ir-engine/spatial/src/xrui/Widg
 
 import { AvatarSpawnSystem } from '../networking/AvatarSpawnSystem'
 // import { AvatarUISystem } from '../systems/AvatarUISystem'
-import { LoadingUISystem } from '../systems/LoadingUISystem'
+// import { LoadingUISystem } from '../systems/LoadingUISystem'
 // import { MediaControlSystem } from '../systems/MediaControlSystem'
 import { PositionalAudioSystem } from '../systems/PositionalAudioSystem'
 // import { WarningUISystem } from '../systems/WarningUISystem'
@@ -42,7 +42,7 @@ export {
   AvatarSpawnSystem,
   // AvatarUISystem,
   LinkRedirectSystem,
-  LoadingUISystem,
+  // LoadingUISystem,
   // MediaControlSystem,
   PortalRedirectSystem,
   PositionalAudioSystem,

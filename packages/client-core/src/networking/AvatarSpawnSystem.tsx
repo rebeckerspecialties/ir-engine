@@ -166,6 +166,7 @@ const reactor = () => {
   const name = useOptionalComponent(sceneEntity, NameComponent)?.value
 
   // TODO: why doesn't this finish loading?
+  // TODO: validate that all parts of sky-station.gltf load, simplify if needed
   console.log(gltfLoaded, userID, name)
 
   if (!gltfLoaded || !userID) return null
