@@ -21,7 +21,6 @@
   "dependencies": {
     "@callstack/react-native-draco": "^0.3.0",
     "@expo/browser-polyfill": "^1.0.1",
-    "@ir-engine/client-core-mobile": "^1.6.0",
     "@ir-engine/common": "^1.6.0",
     "@ir-engine/engine": "^1.6.0",
     "@ir-engine/hyperflux": "^1.6.0",
