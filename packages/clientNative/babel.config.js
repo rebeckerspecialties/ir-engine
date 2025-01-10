@@ -28,7 +28,6 @@ const rootDir = path.resolve(__dirname, '../..');
 
 // List of all packages used by Client Native.
 const packages = [
-  'client-core-mobile',
   'hyperflux',
   'projects',
   'projects-mobile',
