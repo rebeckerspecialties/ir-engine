@@ -23,7 +23,7 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { useLoadLocation } from '@ir-engine/client-core-mobile/src/components/World/LoadLocationScene'
+import { useLoadLocation } from '@ir-engine/client-core/src/components/World/LoadLocationScene'
 
 import { AuthService } from '@ir-engine/client-core/src/user/services/AuthService'
 import multiLogger from '@ir-engine/common/src/logger'
