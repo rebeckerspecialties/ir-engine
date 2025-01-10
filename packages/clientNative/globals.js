@@ -28,7 +28,7 @@ import 'react-native-get-random-values';
 import {TextEncoder, TextDecoder} from 'text-encoding-shim';
 import structuredClone from '@ungap/structured-clone';
 
-globalThis.XMLSerializer = class XMLSerializer {};
+globalThis.XMLSerializer = class XMLSerializer { }
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 global.structuredClone = structuredClone;
@@ -47,32 +47,8 @@ global.localStorage = {
     return (this._data = {});
   },
 };
-
-// Window polyfill
-const listenerRegistry = new Map();
-
-window.addEventListener = (type, handler) => {
-  let registry = listenerRegistry.get(type);
-  if (!registry) {
-    registry = new Set();
-    listenerRegistry.set(type, registry);
-  }
-  registry.add(handler);
-};
-window.removeEventListener = (type, handler) => {
-  const registry = listenerRegistry.get(type);
-  if (registry) {
-    registry.delete(handler);
-  }
-};
-window.dispatchEvent = (eventType, evt) => {
-  const listeners = listenerRegistry.get(eventType);
-  if (listeners) {
-    for (const listener of listeners) {
-      listener(evt);
-    }
-  }
-};
+window.addEventListener = () => {};
+window.removeEventListener = () => {};
 
 // Using PixelRatio.get() was causing issues with frame buffers. Let's default to 1.
 window.devicePixelRatio = 1;
@@ -86,4 +62,4 @@ globalThis.window.history = {
   forward: () => {},
   length: 0,
   state: null,
-};
+}

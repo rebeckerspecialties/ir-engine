@@ -23,8 +23,8 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import {useEngineInjection} from '@ir-engine/client-core/src/components/World/EngineHooks';
-import {useEngineCanvas} from '@ir-engine/client-core/src/hooks/useEngineCanvas';
+import {useEngineInjection} from '@ir-engine/client-core-mobile/src/components/World/EngineHooks';
+import {useEngineCanvas} from '@ir-engine/client-core-mobile/src/hooks/useEngineCanvas';
 import {useSpatialEngine} from '@ir-engine/spatial/src/initializeEngine';
 import {GLView} from 'expo-gl';
 import {useCallback, useState} from 'react';
@@ -33,22 +33,18 @@ import {
   NativeHTMLCanvasElement,
   NativeWebGLRenderingContext,
 } from '../../polyfill/NativeHTMLCanvasElement';
-import LocationPage from '@ir-engine/client-core/src/world/Location';
+import LocationPage from '@ir-engine/client-core-mobile/src/world/Location';
 
 import '../../engine';
-import {createCanvasEventHandler} from '../../polyfill/CanvasEventHandler';
-import {TouchGamepad} from '../../common/components/TouchGamepad';
 
 const {width, height} = Dimensions.get('window');
-
-const {eventListenerRegistry, pointerEvents} = createCanvasEventHandler();
 
 const LocationRoutes = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
   const onContextCreate = useCallback(
     (context: NativeWebGLRenderingContext) => {
-      setCanvas(new NativeHTMLCanvasElement(context, eventListenerRegistry));
+      setCanvas(new NativeHTMLCanvasElement(context));
     },
     [],
   );
@@ -67,14 +63,13 @@ const LocationRoutes = () => {
   }
 
   return (
-    <View {...pointerEvents}>
+    <View>
       <LocationPage
         params={{
           locationName: 'sky-station',
         }}
       />
       <GLView style={{width, height}} onContextCreate={onContextCreate} />
-      <TouchGamepad />
     </View>
   );
 };
