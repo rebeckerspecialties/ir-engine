@@ -1,5 +1,3 @@
-// @ts-nocheck - This file is not yet converted to TypeScript
-
 /*
 CPAL-1.0 License
 
