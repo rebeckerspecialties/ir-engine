@@ -1363,6 +1363,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-basis-universal (0.3.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-draco (0.3.0):
     - DoubleConversion
     - glog
@@ -1734,6 +1755,7 @@ DEPENDENCIES:
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../../../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - "react-native-basis-universal (from `../../../node_modules/@callstack/react-native-basis-universal`)"
   - "react-native-draco (from `../../../node_modules/@callstack/react-native-draco`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
@@ -1876,6 +1898,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-basis-universal:
+    :path: "../../../node_modules/@callstack/react-native-basis-universal"
   react-native-draco:
     :path: "../../../node_modules/@callstack/react-native-draco"
   react-native-get-random-values:
@@ -2002,6 +2026,7 @@ SPEC CHECKSUMS:
   React-logger: addd140841248966c2547eb94836399cc1061f4d
   React-Mapbuffer: 1bc8e611871f4965dac0bc47a4561421a6e20f69
   React-microtasksnativemodule: cff02bc87f8a1d5b9985c1c92ea8e84e854229d9
+  react-native-basis-universal: a4f060a9b1118991a8a9c08157fb27b609861b3e
   react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
@@ -2037,6 +2062,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: b31c16dc8150acf90019a65ce2da4b47fab913cb
 
-PODFILE CHECKSUM: 8bbb9ee26c0034dd601d94c137a968f3e9b5c0fe
+PODFILE CHECKSUM: 4ac6aaeb919e40334eb4db2fd588dc1730d05e37
 
 COCOAPODS: 1.15.2

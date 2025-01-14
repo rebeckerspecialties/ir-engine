@@ -30,7 +30,6 @@
   },
   "version": "1.6.0",
   "dependencies": {
-    "@callstack/react-native-basis-universal": "^0.3.0",
     "@dimforge/rapier3d-compat": "0.11.2",
     "@gltf-transform/core": "4.0.10",
     "@gltf-transform/extensions": "4.0.10",
