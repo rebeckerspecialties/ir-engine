@@ -829,11 +829,8 @@ const useLoadTexture = (options: GLTFParserOptions, textureIndex?: number) => {
     loader.setRequestHeader(options.requestHeader)
   }
 
+  // TODO: why is options.json missing fields, e.g. uri?
   const texture = GLTFLoaderFunctions.useLoadTextureImage(options, textureIndex, sourceIndex, loader)
-  if (basisu) {
-    // TODO: validate texture loading with ktx2loader
-    console.log('loading texture', texture)
-  }
 
   return texture
 }
@@ -910,6 +907,8 @@ const useLoadImageSource = (
 
   // TODO: validate skybox
   const bufferViewSourceURI = GLTFLoaderFunctions.useLoadBufferView(options, sourceDef?.bufferView)
+
+  console.log(sourceDef, bufferViewSourceURI)
 
   useEffect(() => {
     if (!error) return

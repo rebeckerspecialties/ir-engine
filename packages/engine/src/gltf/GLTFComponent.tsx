@@ -265,7 +265,7 @@ const ResourceReactor = (props: { documentID: string; entity: Entity }) => {
     if (!getState(GLTFDocumentState)[props.documentID]) return
     const entities = resourceQuery.filter((e) => getComponent(e, SourceComponent) === props.documentID)
     // TODO: why isn't avatar dependency loaded?
-    console.log(props, entities, dependenciesLoaded, getState(GLTFDocumentState)[props.documentID])
+    // console.log(props, entities, dependenciesLoaded, getState(GLTFDocumentState)[props.documentID])
     if (!entities.length) {
       if (dependenciesLoaded) {
         getMutableComponent(props.entity, GLTFComponent).progress.set(100)
