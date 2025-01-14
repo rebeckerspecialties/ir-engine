@@ -905,7 +905,7 @@ const useLoadImageSource = (
   const [loadedTexture, error] = useTexture(sourceURI.value, UndefinedEntity, () => {}, loader)
   let isObjectURL = false
 
-  // TODO: validate skybox
+  // TODO: validate skybox, validate options.body gets set
   const bufferViewSourceURI = GLTFLoaderFunctions.useLoadBufferView(options, sourceDef?.bufferView)
 
   console.log(sourceDef, bufferViewSourceURI)
