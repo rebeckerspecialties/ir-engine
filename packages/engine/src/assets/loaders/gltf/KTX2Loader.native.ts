@@ -36,7 +36,6 @@ Infinite Reality Engine. All Rights Reserved.
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
 
-import { isClient } from '@ir-engine/hyperflux'
 import {
   CompressedArrayTexture,
   CompressedCubeTexture,
@@ -67,7 +66,6 @@ import {
   SRGBColorSpace,
   UnsignedByteType
 } from 'three'
-import WebWorker from 'web-worker'
 import { FileLoader } from '../base/FileLoader'
 import { Loader } from '../base/Loader'
 import { WorkerPool } from './WorkerPool.js'
@@ -168,62 +166,7 @@ class KTX2Loader extends Loader {
   }
 
   init() {
-    if (!this.transcoderPending) {
-      // Load transcoder wrapper.
-      const jsLoader = new FileLoader(this.manager)
-      jsLoader.setPath(this.transcoderPath)
-      jsLoader.setWithCredentials(this.withCredentials)
-      const jsContent = jsLoader.loadAsync('basis_transcoder.js')
-
-      // Load transcoder WASM binary.
-      const binaryLoader = new FileLoader(this.manager)
-      binaryLoader.setPath(this.transcoderPath)
-      binaryLoader.setResponseType('arraybuffer')
-      binaryLoader.setWithCredentials(this.withCredentials)
-      const binaryContent = binaryLoader.loadAsync('basis_transcoder.wasm')
-
-      this.transcoderPending = Promise.all([jsContent, binaryContent]).then(([jsContent, binaryContent]) => {
-        const fn = KTX2Loader.BasisWorker.toString()
-
-        const body = [
-          '/* constants */',
-          'let _EngineFormat = ' + JSON.stringify(KTX2Loader.EngineFormat),
-          'let _TranscoderFormat = ' + JSON.stringify(KTX2Loader.TranscoderFormat),
-          'let _BasisFormat = ' + JSON.stringify(KTX2Loader.BasisFormat),
-          '/* basis_transcoder.js */',
-          jsContent,
-          '/* worker */',
-          fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
-        ].join('\n')
-
-        this.workerSourceURL = URL.createObjectURL(new Blob([body]))
-        this.transcoderBinary = binaryContent
-
-        this.workerPool.setWorkerCreator(() => {
-          const worker = isClient
-            ? new Worker(this.workerSourceURL)
-            : new WebWorker(`data:image/ktx2;base64,${Buffer.from(body, 'utf-8').toString('base64')}`)
-          const transcoderBinary = this.transcoderBinary.slice(0)
-
-          worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
-
-          return worker
-        })
-      })
-
-      if (_activeLoaders > 0) {
-        // Each instance loads a transcoder and allocates workers, increasing network and memory cost.
-
-        console.warn(
-          'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.' +
-            ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
-        )
-      }
-
-      _activeLoaders++
-    }
-
-    return this.transcoderPending
+    return Promise.resolve()
   }
 
   load(url, onLoad, onProgress, onError, signal) {
@@ -324,12 +267,12 @@ class KTX2Loader extends Loader {
 
 /* CONSTANTS */
 
-KTX2Loader.BasisFormat = {
+const _BasisFormat = {
   ETC1S: 0,
   UASTC_4x4: 1
 }
 
-KTX2Loader.TranscoderFormat = {
+const _TranscoderFormat = {
   ETC1: 0,
   ETC2: 1,
   BC1: 2,
@@ -349,7 +292,7 @@ KTX2Loader.TranscoderFormat = {
   RGBA4444: 16
 }
 
-KTX2Loader.EngineFormat = {
+const _EngineFormat = {
   RGBAFormat: RGBAFormat,
   RGBA_ASTC_4x4_Format: RGBA_ASTC_4x4_Format,
   RGBA_BPTC_Format: RGBA_BPTC_Format,
@@ -364,7 +307,7 @@ KTX2Loader.EngineFormat = {
 
 /* WEB WORKER */
 
-KTX2Loader.BasisWorker = function () {
+const BasisWorker = function () {
   let config
   let transcoderPending
   let BasisModule
