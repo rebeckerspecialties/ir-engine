@@ -1384,6 +1384,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-blob-jsi-helper (0.3.1):
+    - React
+    - React-Core
   - react-native-draco (0.3.0):
     - DoubleConversion
     - glog
@@ -1697,6 +1700,8 @@ PODS:
     - React-logger (= 0.76.2)
     - React-perflogger (= 0.76.2)
     - React-utils (= 0.76.2)
+  - rn-fetch-blob (0.12.0):
+    - React-Core
   - RNFBApp (21.6.1):
     - Firebase/CoreOnly (= 11.5.0)
     - React-Core
@@ -1756,6 +1761,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../../../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-basis-universal (from `../../../node_modules/@callstack/react-native-basis-universal`)"
+  - react-native-blob-jsi-helper (from `../../../node_modules/react-native-blob-jsi-helper`)
   - "react-native-draco (from `../../../node_modules/@callstack/react-native-draco`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
@@ -1786,6 +1792,7 @@ DEPENDENCIES:
   - React-utils (from `../../../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
+  - rn-fetch-blob (from `../../../node_modules/rn-fetch-blob`)
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
   - "RNFBCrashlytics (from `../../../node_modules/@react-native-firebase/crashlytics`)"
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -1900,6 +1907,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-basis-universal:
     :path: "../../../node_modules/@callstack/react-native-basis-universal"
+  react-native-blob-jsi-helper:
+    :path: "../../../node_modules/react-native-blob-jsi-helper"
   react-native-draco:
     :path: "../../../node_modules/@callstack/react-native-draco"
   react-native-get-random-values:
@@ -1960,6 +1969,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
+  rn-fetch-blob:
+    :path: "../../../node_modules/rn-fetch-blob"
   RNFBApp:
     :path: "../../../node_modules/@react-native-firebase/app"
   RNFBCrashlytics:
@@ -2027,6 +2038,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 1bc8e611871f4965dac0bc47a4561421a6e20f69
   React-microtasksnativemodule: cff02bc87f8a1d5b9985c1c92ea8e84e854229d9
   react-native-basis-universal: a4f060a9b1118991a8a9c08157fb27b609861b3e
+  react-native-blob-jsi-helper: bd7509e50b0f906044c53ad7ab767786054424c9
   react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
@@ -2057,6 +2069,7 @@ SPEC CHECKSUMS:
   React-utils: 7ce63e32e4ca425cc73cfb84e656bfb9e02e58b3
   ReactCodegen: a5ac173008732c4c4af50cbd7bc0d176b63e4939
   ReactCommon: a1c914f7575011239a63603a95fb341d0331953c
+  rn-fetch-blob: 25612b6d6f6e980c6f17ed98ba2f58f5696a51ca
   RNFBApp: 72b96921c64702d51eca9f3ed579c1777efd0d7e
   RNFBCrashlytics: 22223ee96beba1130c8906253f5b900f629c2926
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

@@ -223,6 +223,7 @@ class KTX2Loader extends Loader {
 
   _createTextureFrom(transcodeResult, container) {
     const { faces, width, height, format, type, error, dfdFlags } = transcodeResult
+    console.log(transcodeResult)
 
     if (type === 'error') return Promise.reject(error)
 
@@ -266,7 +267,7 @@ class KTX2Loader extends Loader {
       .then(() => {
         return this.basisWorker.transcode(buffer)
       })
-      .then((e) => this._createTextureFrom(e.buffers, container))
+      .then((e) => this._createTextureFrom(e, container))
 
     // Cache the task result.
     _taskCache.set(buffer, { promise: texturePending })

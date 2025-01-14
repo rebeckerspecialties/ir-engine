@@ -48,6 +48,14 @@ export const initializeKTX2Loader = (loader: GLTFLoader) => {
   ktxLoader.setTranscoderPath(getState(DomainConfigState).publicDomain + '/loader_decoders/basis/')
   // FIXME: We are unable to spawn WebGLRenderer without Expo GL context. Is this required?
   if (global.RN$Bridgeless) {
+    ktxLoader.detectSupport({
+      isWebGPURenderer: false,
+      hasFeature: () => false,
+      extensions: new Map(),
+      capabilities: {
+        isWebGL2: true
+      }
+    })
     loader.setKTX2Loader(ktxLoader)
     return
   } else {
