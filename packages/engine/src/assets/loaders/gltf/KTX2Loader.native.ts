@@ -1,3 +1,5 @@
+// @ts-nocheck - This file is not yet converted to TypeScript
+
 /*
 CPAL-1.0 License
 
@@ -19,42 +21,218 @@ The Original Code is Infinite Reality Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Infinite Reality Engine team.
 
-All portions of the code written by the Infinite Reality Engine team are Copyright © 2021-2023
+All portions of the code written by the Infinite Reality Engine team are Copyright � 2021-2023
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import * as BasisModule from '@callstack/react-native-basis-universal'
-import { CompressedTexture, LoadingManager, WebGLRenderer } from 'three'
+/**
+ * Loader for KTX 2.0 GPU Texture containers.
+ *
+ * KTX 2.0 is a container format for various GPU texture formats. The loader
+ * supports Basis Universal GPU textures, which can be quickly transcoded to
+ * a wide variety of GPU texture compression formats. While KTX 2.0 also allows
+ * other hardware-specific formats, this loader does not yet parse them.
+ *
+ * References:
+ * - KTX: http://github.khronos.org/KTX-Specification/
+ * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
+ */
+
+import { isClient } from '@ir-engine/hyperflux'
+import {
+  CompressedArrayTexture,
+  CompressedCubeTexture,
+  CompressedTexture,
+  Data3DTexture,
+  DataTexture,
+  DisplayP3ColorSpace,
+  FloatType,
+  HalfFloatType,
+  LinearDisplayP3ColorSpace,
+  LinearFilter,
+  LinearMipmapLinearFilter,
+  LinearSRGBColorSpace,
+  NoColorSpace,
+  RGBAFormat,
+  RGBA_ASTC_4x4_Format,
+  RGBA_ASTC_6x6_Format,
+  RGBA_BPTC_Format,
+  RGBA_ETC2_EAC_Format,
+  RGBA_PVRTC_4BPPV1_Format,
+  RGBA_S3TC_DXT5_Format,
+  RGB_ETC1_Format,
+  RGB_ETC2_Format,
+  RGB_PVRTC_4BPPV1_Format,
+  RGB_S3TC_DXT1_Format,
+  RGFormat,
+  RedFormat,
+  SRGBColorSpace,
+  UnsignedByteType
+} from 'three'
+import WebWorker from 'web-worker'
 import { FileLoader } from '../base/FileLoader'
 import { Loader } from '../base/Loader'
+import { WorkerPool } from './WorkerPool.js'
+import {
+  KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
+  KHR_DF_PRIMARIES_BT709,
+  KHR_DF_PRIMARIES_DISPLAYP3,
+  KHR_DF_PRIMARIES_UNSPECIFIED,
+  KHR_DF_TRANSFER_SRGB,
+  KHR_SUPERCOMPRESSION_NONE,
+  KHR_SUPERCOMPRESSION_ZSTD,
+  VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+  VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+  VK_FORMAT_R16G16B16A16_SFLOAT,
+  VK_FORMAT_R16G16_SFLOAT,
+  VK_FORMAT_R16_SFLOAT,
+  VK_FORMAT_R32G32B32A32_SFLOAT,
+  VK_FORMAT_R32G32_SFLOAT,
+  VK_FORMAT_R32_SFLOAT,
+  VK_FORMAT_R8G8B8A8_SRGB,
+  VK_FORMAT_R8G8B8A8_UNORM,
+  VK_FORMAT_R8G8_SRGB,
+  VK_FORMAT_R8G8_UNORM,
+  VK_FORMAT_R8_SRGB,
+  VK_FORMAT_R8_UNORM,
+  VK_FORMAT_UNDEFINED,
+  read
+} from './ktx-parse.module.js'
+import { ZSTDDecoder } from './zstddec.module.js'
 
-export class KTX2Loader extends Loader {
-  constructor(manager?: LoadingManager) {
+const _taskCache = new WeakMap()
+
+let _activeLoaders = 0
+
+let _zstd
+
+class KTX2Loader extends Loader {
+  constructor(manager) {
     super(manager)
-    console.warn('NATIVE KTX2 LOADER IS INITIALIZED')
+
+    this.transcoderPath = ''
+    this.transcoderBinary = null
+    this.transcoderPending = null
+
+    this.workerPool = new WorkerPool()
+    this.workerSourceURL = ''
+    this.workerConfig = null
+
+    if (typeof MSC_TRANSCODER !== 'undefined') {
+      console.warn(
+        'THREE.KTX2Loader: Please update to latest "basis_transcoder".' +
+          ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
+      )
+    }
+  }
+
+  setTranscoderPath(path) {
+    this.transcoderPath = path
+
     return this
   }
 
-  setTranscoderPath(path: string): KTX2Loader {
-    return this
-  }
-  setWorkerLimit(limit: number): KTX2Loader {
-    return this
-  }
-  detectSupport(renderer: WebGLRenderer | null): KTX2Loader {
-    return this
-  }
-  dispose(): KTX2Loader {
+  setWorkerLimit(num) {
+    this.workerPool.setWorkerLimit(num)
+
     return this
   }
 
-  load(
-    url: string,
-    onLoad: (texture: CompressedTexture) => void,
-    onProgress?: (requrest: ProgressEvent<EventTarget>) => void | undefined,
-    onError?: ((event: ErrorEvent) => void) | undefined,
-    signal?: AbortSignal
-  ) {
+  detectSupport(renderer) {
+    if (renderer.isWebGPURenderer === true) {
+      this.workerConfig = {
+        astcSupported: renderer.hasFeature('texture-compression-astc'),
+        etc1Supported: false,
+        etc2Supported: renderer.hasFeature('texture-compression-etc2'),
+        dxtSupported: renderer.hasFeature('texture-compression-bc'),
+        bptcSupported: false,
+        pvrtcSupported: false
+      }
+    } else {
+      this.workerConfig = {
+        astcSupported: renderer.extensions.has('WEBGL_compressed_texture_astc'),
+        etc1Supported: renderer.extensions.has('WEBGL_compressed_texture_etc1'),
+        etc2Supported: renderer.extensions.has('WEBGL_compressed_texture_etc'),
+        dxtSupported: renderer.extensions.has('WEBGL_compressed_texture_s3tc'),
+        bptcSupported: renderer.extensions.has('EXT_texture_compression_bptc'),
+        pvrtcSupported:
+          renderer.extensions.has('WEBGL_compressed_texture_pvrtc') ||
+          renderer.extensions.has('WEBKIT_WEBGL_compressed_texture_pvrtc')
+      }
+
+      if (renderer.capabilities.isWebGL2) {
+        // https://github.com/mrdoob/three.js/pull/22928
+        this.workerConfig.etc1Supported = false
+      }
+    }
+
+    return this
+  }
+
+  init() {
+    if (!this.transcoderPending) {
+      // Load transcoder wrapper.
+      const jsLoader = new FileLoader(this.manager)
+      jsLoader.setPath(this.transcoderPath)
+      jsLoader.setWithCredentials(this.withCredentials)
+      const jsContent = jsLoader.loadAsync('basis_transcoder.js')
+
+      // Load transcoder WASM binary.
+      const binaryLoader = new FileLoader(this.manager)
+      binaryLoader.setPath(this.transcoderPath)
+      binaryLoader.setResponseType('arraybuffer')
+      binaryLoader.setWithCredentials(this.withCredentials)
+      const binaryContent = binaryLoader.loadAsync('basis_transcoder.wasm')
+
+      this.transcoderPending = Promise.all([jsContent, binaryContent]).then(([jsContent, binaryContent]) => {
+        const fn = KTX2Loader.BasisWorker.toString()
+
+        const body = [
+          '/* constants */',
+          'let _EngineFormat = ' + JSON.stringify(KTX2Loader.EngineFormat),
+          'let _TranscoderFormat = ' + JSON.stringify(KTX2Loader.TranscoderFormat),
+          'let _BasisFormat = ' + JSON.stringify(KTX2Loader.BasisFormat),
+          '/* basis_transcoder.js */',
+          jsContent,
+          '/* worker */',
+          fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
+        ].join('\n')
+
+        this.workerSourceURL = URL.createObjectURL(new Blob([body]))
+        this.transcoderBinary = binaryContent
+
+        this.workerPool.setWorkerCreator(() => {
+          const worker = isClient
+            ? new Worker(this.workerSourceURL)
+            : new WebWorker(`data:image/ktx2;base64,${Buffer.from(body, 'utf-8').toString('base64')}`)
+          const transcoderBinary = this.transcoderBinary.slice(0)
+
+          worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
+
+          return worker
+        })
+      })
+
+      if (_activeLoaders > 0) {
+        // Each instance loads a transcoder and allocates workers, increasing network and memory cost.
+
+        console.warn(
+          'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.' +
+            ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
+        )
+      }
+
+      _activeLoaders++
+    }
+
+    return this.transcoderPending
+  }
+
+  load(url, onLoad, onProgress, onError, signal) {
+    if (this.workerConfig === null) {
+      throw new Error('THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.')
+    }
+
     const loader = new FileLoader(this.manager)
 
     loader.setResponseType('arraybuffer')
@@ -63,6 +241,14 @@ export class KTX2Loader extends Loader {
     loader.load(
       url,
       (buffer) => {
+        // Check for an existing task using this buffer. A transferred buffer cannot be transferred
+        // again from this thread.
+        if (_taskCache.has(buffer)) {
+          const cachedTask = _taskCache.get(buffer)
+
+          return cachedTask.promise.then(onLoad).catch(onError)
+        }
+
         this._createTexture(buffer)
           .then((texture) => (onLoad ? onLoad(texture) : null))
           .catch(onError)
@@ -71,6 +257,35 @@ export class KTX2Loader extends Loader {
       onError,
       signal
     )
+  }
+
+  _createTextureFrom(transcodeResult, container) {
+    const { faces, width, height, format, type, error, dfdFlags } = transcodeResult
+
+    if (type === 'error') return Promise.reject(error)
+
+    let texture
+
+    if (container.faceCount === 6) {
+      texture = new CompressedCubeTexture(faces, format, UnsignedByteType)
+    } else {
+      const mipmaps = faces[0].mipmaps
+
+      texture =
+        container.layerCount > 1
+          ? new CompressedArrayTexture(mipmaps, width, height, container.layerCount, format, UnsignedByteType)
+          : new CompressedTexture(mipmaps, width, height, format, UnsignedByteType)
+    }
+
+    texture.minFilter = faces[0].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter
+    texture.magFilter = LinearFilter
+    texture.generateMipmaps = false
+
+    texture.needsUpdate = true
+    texture.colorSpace = parseColorSpace(container)
+    texture.premultiplyAlpha = !!(dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED)
+
+    return texture
   }
 
   /**
@@ -98,11 +313,63 @@ export class KTX2Loader extends Loader {
 
     return texturePending
   }
+
+  dispose() {
+    this.workerPool.dispose()
+    if (this.workerSourceURL) URL.revokeObjectURL(this.workerSourceURL)
+
+    _activeLoaders--
+
+    return this
+  }
 }
+
+/* CONSTANTS */
+
+KTX2Loader.BasisFormat = {
+  ETC1S: 0,
+  UASTC_4x4: 1
+}
+
+KTX2Loader.TranscoderFormat = {
+  ETC1: 0,
+  ETC2: 1,
+  BC1: 2,
+  BC3: 3,
+  BC4: 4,
+  BC5: 5,
+  BC7_M6_OPAQUE_ONLY: 6,
+  BC7_M5: 7,
+  PVRTC1_4_RGB: 8,
+  PVRTC1_4_RGBA: 9,
+  ASTC_4x4: 10,
+  ATC_RGB: 11,
+  ATC_RGBA_INTERPOLATED_ALPHA: 12,
+  RGBA32: 13,
+  RGB565: 14,
+  BGR565: 15,
+  RGBA4444: 16
+}
+
+KTX2Loader.EngineFormat = {
+  RGBAFormat: RGBAFormat,
+  RGBA_ASTC_4x4_Format: RGBA_ASTC_4x4_Format,
+  RGBA_BPTC_Format: RGBA_BPTC_Format,
+  RGBA_ETC2_EAC_Format: RGBA_ETC2_EAC_Format,
+  RGBA_PVRTC_4BPPV1_Format: RGBA_PVRTC_4BPPV1_Format,
+  RGBA_S3TC_DXT5_Format: RGBA_S3TC_DXT5_Format,
+  RGB_ETC1_Format: RGB_ETC1_Format,
+  RGB_ETC2_Format: RGB_ETC2_Format,
+  RGB_PVRTC_4BPPV1_Format: RGB_PVRTC_4BPPV1_Format,
+  RGB_S3TC_DXT1_Format: RGB_S3TC_DXT1_Format
+}
+
+/* WEB WORKER */
 
 KTX2Loader.BasisWorker = function () {
   let config
   let transcoderPending
+  let BasisModule
 
   const EngineFormat = _EngineFormat
   const TranscoderFormat = _TranscoderFormat
@@ -138,8 +405,8 @@ KTX2Loader.BasisWorker = function () {
 
   function init(wasmBinary) {
     transcoderPending = new Promise((resolve) => {
-      // BasisModule = { wasmBinary, onRuntimeInitialized: resolve }
-      // BASIS(BasisModule)
+      BasisModule = { wasmBinary, onRuntimeInitialized: resolve }
+      BASIS(BasisModule)
     }).then(() => {
       BasisModule.initializeBasis()
 
@@ -374,3 +641,161 @@ KTX2Loader.BasisWorker = function () {
     return result
   }
 }
+
+//
+// Parsing for non-Basis textures. These textures are may have supercompression
+// like Zstd, but they do not require transcoding.
+
+const UNCOMPRESSED_FORMATS = new Set([RGBAFormat, RGFormat, RedFormat])
+
+const FORMAT_MAP = {
+  [VK_FORMAT_R32G32B32A32_SFLOAT]: RGBAFormat,
+  [VK_FORMAT_R16G16B16A16_SFLOAT]: RGBAFormat,
+  [VK_FORMAT_R8G8B8A8_UNORM]: RGBAFormat,
+  [VK_FORMAT_R8G8B8A8_SRGB]: RGBAFormat,
+
+  [VK_FORMAT_R32G32_SFLOAT]: RGFormat,
+  [VK_FORMAT_R16G16_SFLOAT]: RGFormat,
+  [VK_FORMAT_R8G8_UNORM]: RGFormat,
+  [VK_FORMAT_R8G8_SRGB]: RGFormat,
+
+  [VK_FORMAT_R32_SFLOAT]: RedFormat,
+  [VK_FORMAT_R16_SFLOAT]: RedFormat,
+  [VK_FORMAT_R8_SRGB]: RedFormat,
+  [VK_FORMAT_R8_UNORM]: RedFormat,
+
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: RGBA_ASTC_6x6_Format,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: RGBA_ASTC_6x6_Format
+}
+
+const TYPE_MAP = {
+  [VK_FORMAT_R32G32B32A32_SFLOAT]: FloatType,
+  [VK_FORMAT_R16G16B16A16_SFLOAT]: HalfFloatType,
+  [VK_FORMAT_R8G8B8A8_UNORM]: UnsignedByteType,
+  [VK_FORMAT_R8G8B8A8_SRGB]: UnsignedByteType,
+
+  [VK_FORMAT_R32G32_SFLOAT]: FloatType,
+  [VK_FORMAT_R16G16_SFLOAT]: HalfFloatType,
+  [VK_FORMAT_R8G8_UNORM]: UnsignedByteType,
+  [VK_FORMAT_R8G8_SRGB]: UnsignedByteType,
+
+  [VK_FORMAT_R32_SFLOAT]: FloatType,
+  [VK_FORMAT_R16_SFLOAT]: HalfFloatType,
+  [VK_FORMAT_R8_SRGB]: UnsignedByteType,
+  [VK_FORMAT_R8_UNORM]: UnsignedByteType,
+
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: UnsignedByteType
+}
+
+async function createRawTexture(container) {
+  const { vkFormat } = container
+
+  if (FORMAT_MAP[vkFormat] === undefined) {
+    throw new Error('THREE.KTX2Loader: Unsupported vkFormat.')
+  }
+
+  //
+
+  let zstd
+
+  if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD) {
+    if (!_zstd) {
+      _zstd = new Promise(async (resolve) => {
+        const zstd = new ZSTDDecoder()
+        await zstd.init()
+        resolve(zstd)
+      })
+    }
+
+    zstd = await _zstd
+  }
+
+  //
+
+  const mipmaps = []
+
+  for (let levelIndex = 0; levelIndex < container.levels.length; levelIndex++) {
+    const levelWidth = Math.max(1, container.pixelWidth >> levelIndex)
+    const levelHeight = Math.max(1, container.pixelHeight >> levelIndex)
+    const levelDepth = container.pixelDepth ? Math.max(1, container.pixelDepth >> levelIndex) : 0
+
+    const level = container.levels[levelIndex]
+
+    let levelData
+
+    if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE) {
+      levelData = level.levelData
+    } else if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD) {
+      levelData = zstd.decode(level.levelData, level.uncompressedByteLength)
+    } else {
+      throw new Error('THREE.KTX2Loader: Unsupported supercompressionScheme.')
+    }
+
+    let data
+
+    if (TYPE_MAP[vkFormat] === FloatType) {
+      data = new Float32Array(
+        levelData.buffer,
+        levelData.byteOffset,
+        levelData.byteLength / Float32Array.BYTES_PER_ELEMENT
+      )
+    } else if (TYPE_MAP[vkFormat] === HalfFloatType) {
+      data = new Uint16Array(
+        levelData.buffer,
+        levelData.byteOffset,
+        levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT
+      )
+    } else {
+      data = levelData
+    }
+
+    mipmaps.push({
+      data: data,
+      width: levelWidth,
+      height: levelHeight,
+      depth: levelDepth
+    })
+  }
+
+  let texture
+
+  if (UNCOMPRESSED_FORMATS.has(FORMAT_MAP[vkFormat])) {
+    texture =
+      container.pixelDepth === 0
+        ? new DataTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight)
+        : new Data3DTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight, container.pixelDepth)
+  } else {
+    if (container.pixelDepth > 0) throw new Error('THREE.KTX2Loader: Unsupported pixelDepth.')
+
+    texture = new CompressedTexture(mipmaps, container.pixelWidth, container.pixelHeight)
+  }
+
+  texture.mipmaps = mipmaps
+
+  texture.type = TYPE_MAP[vkFormat]
+  texture.format = FORMAT_MAP[vkFormat]
+  texture.colorSpace = parseColorSpace(container)
+  texture.needsUpdate = true
+
+  //
+
+  return Promise.resolve(texture)
+}
+
+function parseColorSpace(container) {
+  const dfd = container.dataFormatDescriptor[0]
+
+  if (dfd.colorPrimaries === KHR_DF_PRIMARIES_BT709) {
+    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : LinearSRGBColorSpace
+  } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_DISPLAYP3) {
+    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? DisplayP3ColorSpace : LinearDisplayP3ColorSpace
+  } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_UNSPECIFIED) {
+    return NoColorSpace
+  } else {
+    console.warn(`THREE.KTX2Loader: Unsupported color primaries, "${dfd.colorPrimaries}"`)
+    return NoColorSpace
+  }
+}
+
+export { KTX2Loader }
