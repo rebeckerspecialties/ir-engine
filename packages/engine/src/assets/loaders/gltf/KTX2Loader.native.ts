@@ -64,11 +64,11 @@ import {
   RGFormat,
   RedFormat,
   SRGBColorSpace,
+  TypedArray,
   UnsignedByteType
 } from 'three'
 import { FileLoader } from '../base/FileLoader'
 import { Loader } from '../base/Loader'
-import { WorkerPool } from './WorkerPool.js'
 import {
   KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
   KHR_DF_PRIMARIES_BT709,
@@ -102,7 +102,26 @@ let _activeLoaders = 0
 
 let _zstd
 
+type BasisWorkerConfig = {
+  astcSupported: boolean
+  etc1Supported: boolean
+  etc2Supported: boolean
+  dxtSupported: boolean
+  bptcSupported: boolean
+  pvrtcSupported: boolean
+}
+
+type BasisWorker = {
+  init: (messageConfig: BasisWorkerConfig) => void
+  transcode: (buffer: TypedArray) => {
+    buffers: TypedArray
+  }
+}
+
 class KTX2Loader extends Loader {
+  private basisWorker: BasisWorker
+  private workerConfig: BasisWorkerConfig | null
+
   constructor(manager) {
     super(manager)
 
@@ -110,9 +129,9 @@ class KTX2Loader extends Loader {
     this.transcoderBinary = null
     this.transcoderPending = null
 
-    this.workerPool = new WorkerPool()
-    this.workerSourceURL = ''
     this.workerConfig = null
+
+    this.basisWorker = createBasisWorker()
 
     if (typeof MSC_TRANSCODER !== 'undefined') {
       console.warn(
@@ -129,8 +148,6 @@ class KTX2Loader extends Loader {
   }
 
   setWorkerLimit(num) {
-    this.workerPool.setWorkerLimit(num)
-
     return this
   }
 
@@ -166,6 +183,7 @@ class KTX2Loader extends Loader {
   }
 
   init() {
+    this.basisWorker.init(this.workerConfig)
     return Promise.resolve()
   }
 
@@ -241,13 +259,11 @@ class KTX2Loader extends Loader {
       return createRawTexture(container)
     }
 
-    //
-    const taskConfig = config
     const texturePending = this.init()
       .then(() => {
-        return this.workerPool.postMessage({ type: 'transcode', buffer, taskConfig: taskConfig }, [buffer])
+        return this.basisWorker.transcode(buffer)
       })
-      .then((e) => this._createTextureFrom(e.data, container))
+      .then((e) => this._createTextureFrom(e.buffers, container))
 
     // Cache the task result.
     _taskCache.set(buffer, { promise: texturePending })
@@ -256,9 +272,6 @@ class KTX2Loader extends Loader {
   }
 
   dispose() {
-    this.workerPool.dispose()
-    if (this.workerSourceURL) URL.revokeObjectURL(this.workerSourceURL)
-
     _activeLoaders--
 
     return this
@@ -307,54 +320,44 @@ const _EngineFormat = {
 
 /* WEB WORKER */
 
-const BasisWorker = function () {
+const createBasisWorker = function () {
   let config
-  let transcoderPending
-  let BasisModule
 
   const EngineFormat = _EngineFormat
   const TranscoderFormat = _TranscoderFormat
   const BasisFormat = _BasisFormat
 
-  self.addEventListener('message', function (e) {
-    const message = e.data
+  // self.addEventListener('message', function (e) {
+  //   const message = e.data
 
-    switch (message.type) {
-      case 'init':
-        config = message.config
-        init(message.transcoderBinary)
-        break
+  //   switch (message.type) {
+  //     case 'init':
+  //       config = message.config
+  //       init(message.transcoderBinary)
+  //       break
 
-      case 'transcode':
-        transcoderPending.then(() => {
-          try {
-            const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode(message.buffer)
+  //     case 'transcode':
+  //       transcoderPending.then(() => {
+  //         try {
+  //           const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode(message.buffer)
 
-            self.postMessage(
-              { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags },
-              buffers
-            )
-          } catch (error) {
-            console.error(error)
+  //           self.postMessage(
+  //             { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags },
+  //             buffers
+  //           )
+  //         } catch (error) {
+  //           console.error(error)
 
-            self.postMessage({ type: 'error', id: message.id, error: error.message })
-          }
-        })
-        break
-    }
-  })
+  //           self.postMessage({ type: 'error', id: message.id, error: error.message })
+  //         }
+  //       })
+  //       break
+  //   }
+  // })
 
-  function init(wasmBinary) {
-    transcoderPending = new Promise((resolve) => {
-      BasisModule = { wasmBinary, onRuntimeInitialized: resolve }
-      BASIS(BasisModule)
-    }).then(() => {
-      BasisModule.initializeBasis()
-
-      if (BasisModule.KTX2File === undefined) {
-        console.warn('THREE.KTX2Loader: Please update Basis Universal transcoder.')
-      }
-    })
+  function init(messageConfig) {
+    config = messageConfig
+    BasisModule.initializeBasis()
   }
 
   function transcode(buffer) {
@@ -581,6 +584,8 @@ const BasisWorker = function () {
 
     return result
   }
+
+  return { transcode, init }
 }
 
 //
