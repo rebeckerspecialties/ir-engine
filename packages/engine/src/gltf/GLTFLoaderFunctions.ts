@@ -901,14 +901,11 @@ const useLoadImageSource = (
 
   const sourceURI = useHookstate('')
   const result = useHookstate<Texture | null>(null)
-  // TODO: get this working with KTX2Loader
+  // TODO: validate that this texture gets loaded by native texture loader
   const [loadedTexture, error] = useTexture(sourceURI.value, UndefinedEntity, () => {}, loader)
   let isObjectURL = false
 
-  // TODO: validate skybox, validate options.body gets set
   const bufferViewSourceURI = GLTFLoaderFunctions.useLoadBufferView(options, sourceDef?.bufferView)
-
-  console.log(sourceDef, bufferViewSourceURI)
 
   useEffect(() => {
     if (!error) return
@@ -931,11 +928,13 @@ const useLoadImageSource = (
       }
     }
 
-    if (bufferViewSourceURI && !global.RN$Bridgeless) {
+    // TODO: this should set the url
+    if (bufferViewSourceURI) {
       isObjectURL = true
       const blob = new Blob([bufferViewSourceURI], { type: sourceDef.mimeType })
       const url = URL.createObjectURL(blob)
       sourceURI.set(url)
+      console.log(url)
       return () => {
         URL.revokeObjectURL(url)
         sourceURI.set('')

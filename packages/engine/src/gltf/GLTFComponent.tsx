@@ -462,9 +462,6 @@ export const loadGLTFFile = (
       json = data
     }
 
-    // TODO: why is this body empty?
-    console.log(url, json, body)
-
     /** Migrate old scene json format */
     if ('entities' in json && 'root' in json) {
       json = migrateSceneJSONToGLTF(json)
