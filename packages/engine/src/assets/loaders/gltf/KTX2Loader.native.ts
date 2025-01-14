@@ -36,6 +36,7 @@ Infinite Reality Engine. All Rights Reserved.
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
 
+import * as BasisModule from '@callstack/react-native-basis-universal'
 import {
   CompressedArrayTexture,
   CompressedCubeTexture,
@@ -111,10 +112,17 @@ type BasisWorkerConfig = {
   pvrtcSupported: boolean
 }
 
+type MipMap = {
+  data: TypedArray
+  width?: number
+  height?: number
+  depth?: number
+}
+
 type BasisWorker = {
-  init: (messageConfig: BasisWorkerConfig) => void
+  init: (messageConfig: BasisWorkerConfig | null) => void
   transcode: (buffer: TypedArray) => {
-    buffers: TypedArray
+    buffers: TypedArray[]
   }
 }
 
@@ -125,25 +133,20 @@ class KTX2Loader extends Loader {
   constructor(manager) {
     super(manager)
 
-    this.transcoderPath = ''
-    this.transcoderBinary = null
-    this.transcoderPending = null
-
     this.workerConfig = null
 
     this.basisWorker = createBasisWorker()
 
-    if (typeof MSC_TRANSCODER !== 'undefined') {
-      console.warn(
-        'THREE.KTX2Loader: Please update to latest "basis_transcoder".' +
-          ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
-      )
-    }
+    // if (typeof MSC_TRANSCODER !== 'undefined') {
+    //   console.warn(
+    //     'THREE.KTX2Loader: Please update to latest "basis_transcoder".' +
+    //       ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
+    //   )
+    // }
+    console.warn('Initialized Native KTX2Loader')
   }
 
   setTranscoderPath(path) {
-    this.transcoderPath = path
-
     return this
   }
 
@@ -199,7 +202,7 @@ class KTX2Loader extends Loader {
 
     loader.load(
       url,
-      (buffer) => {
+      (buffer: any) => {
         // Check for an existing task using this buffer. A transferred buffer cannot be transferred
         // again from this thread.
         if (_taskCache.has(buffer)) {
@@ -320,47 +323,19 @@ const _EngineFormat = {
 
 /* WEB WORKER */
 
-const createBasisWorker = function () {
-  let config
+const createBasisWorker = (): BasisWorker => {
+  let config: BasisWorkerConfig | null = null
 
   const EngineFormat = _EngineFormat
   const TranscoderFormat = _TranscoderFormat
   const BasisFormat = _BasisFormat
 
-  // self.addEventListener('message', function (e) {
-  //   const message = e.data
-
-  //   switch (message.type) {
-  //     case 'init':
-  //       config = message.config
-  //       init(message.transcoderBinary)
-  //       break
-
-  //     case 'transcode':
-  //       transcoderPending.then(() => {
-  //         try {
-  //           const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode(message.buffer)
-
-  //           self.postMessage(
-  //             { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags },
-  //             buffers
-  //           )
-  //         } catch (error) {
-  //           console.error(error)
-
-  //           self.postMessage({ type: 'error', id: message.id, error: error.message })
-  //         }
-  //       })
-  //       break
-  //   }
-  // })
-
-  function init(messageConfig) {
+  function init(messageConfig: BasisWorkerConfig | null) {
     config = messageConfig
     BasisModule.initializeBasis()
   }
 
-  function transcode(buffer) {
+  function transcode(buffer: TypedArray) {
     const ktx2File = new BasisModule.KTX2File(new Uint8Array(buffer))
 
     function cleanup() {
@@ -394,16 +369,16 @@ const createBasisWorker = function () {
       throw new Error('THREE.KTX2Loader: .startTranscoding failed')
     }
 
-    const faces = []
-    const buffers = []
+    const faces: { mipmaps: MipMap[]; width: number; height: number; format: any }[] = []
+    const buffers: TypedArray[] = []
 
     for (let face = 0; face < faceCount; face++) {
-      const mipmaps = []
+      const mipmaps: MipMap[] = []
 
       for (let mip = 0; mip < levelCount; mip++) {
-        const layerMips = []
+        const layerMips: Uint8Array[] = []
 
-        let mipWidth, mipHeight
+        let mipWidth: number | undefined, mipHeight: number | undefined
 
         for (let layer = 0; layer < layerCount; layer++) {
           const levelInfo = ktx2File.getImageLevelInfo(mip, layer, face)
@@ -535,7 +510,7 @@ const createBasisWorker = function () {
     for (let i = 0; i < options.length; i++) {
       const opt = options[i]
 
-      if (!config[opt.if]) continue
+      if (!config?.[opt.if]) continue
       if (!opt.basisFormat.includes(basisFormat)) continue
       if (hasAlpha && opt.transcoderFormat.length < 2) continue
       if (opt.needsPowerOfTwo && !(isPowerOfTwo(width) && isPowerOfTwo(height))) continue
@@ -659,7 +634,7 @@ async function createRawTexture(container) {
 
   //
 
-  const mipmaps = []
+  const mipmaps: MipMap[] = []
 
   for (let levelIndex = 0; levelIndex < container.levels.length; levelIndex++) {
     const levelWidth = Math.max(1, container.pixelWidth >> levelIndex)
@@ -714,7 +689,7 @@ async function createRawTexture(container) {
   } else {
     if (container.pixelDepth > 0) throw new Error('THREE.KTX2Loader: Unsupported pixelDepth.')
 
-    texture = new CompressedTexture(mipmaps, container.pixelWidth, container.pixelHeight)
+    texture = new CompressedTexture(mipmaps as unknown as ImageData[], container.pixelWidth, container.pixelHeight)
   }
 
   texture.mipmaps = mipmaps
