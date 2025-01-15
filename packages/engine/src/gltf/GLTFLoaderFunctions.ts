@@ -908,10 +908,6 @@ const useLoadImageSource = (
 
   const bufferViewSourceURI = GLTFLoaderFunctions.useLoadBufferView(options, sourceDef?.bufferView)
 
-  if (loadedTexture) {
-    console.log(loadedTexture)
-  }
-
   useEffect(() => {
     if (!error) return
     console.error(`GLTFLoaderFunctions:useLoadImageSource Error loading texture for uri ${sourceURI.value}`, error)
@@ -933,14 +929,9 @@ const useLoadImageSource = (
       }
     }
 
-    // TODO: this should set the url
     if (bufferViewSourceURI) {
       isObjectURL = true
       const blob = getBlobForArrayBuffer(bufferViewSourceURI)
-
-      // const url = URL.createObjectURL(blob)
-      // sourceURI.set(url)
-      console.log(blob.type, sourceDef.mimeType)
 
       const fileReaderInstance = new FileReader()
       fileReaderInstance.onload = () => {
@@ -957,7 +948,6 @@ const useLoadImageSource = (
       fileReaderInstance.readAsDataURL(blob)
 
       return () => {
-        // URL.revokeObjectURL(url)
         sourceURI.set('')
       }
     }

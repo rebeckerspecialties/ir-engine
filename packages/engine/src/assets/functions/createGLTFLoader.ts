@@ -51,7 +51,15 @@ export const initializeKTX2Loader = (loader: GLTFLoader) => {
     ktxLoader.detectSupport({
       isWebGPURenderer: false,
       hasFeature: () => false,
-      extensions: new Map(),
+      extensions: new Map([
+        ['WEBGL_compressed_texture_astc', true],
+        ['WEBGL_compressed_texture_etc1', false],
+        ['WEBGL_compressed_texture_etc', true],
+        ['WEBGL_compressed_texture_s3tc', false],
+        ['EXT_texture_compression_bptc', false],
+        ['WEBGL_compressed_texture_pvrtc', true],
+        ['WEBKIT_WEBGL_compressed_texture_pvrtc', false]
+      ]),
       capabilities: {
         isWebGL2: true
       }
