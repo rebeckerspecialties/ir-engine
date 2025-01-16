@@ -27,9 +27,7 @@ import '@expo/browser-polyfill';
 import 'react-native-get-random-values';
 import {TextEncoder, TextDecoder} from 'text-encoding-shim';
 import structuredClone from '@ungap/structured-clone';
-// import {URL} from 'whatwg-url-without-unicode';
 
-// global.URL = URL;
 globalThis.XMLSerializer = class XMLSerializer {};
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
