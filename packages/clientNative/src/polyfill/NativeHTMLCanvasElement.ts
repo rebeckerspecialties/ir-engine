@@ -24,7 +24,6 @@ Infinite Reality Engine. All Rights Reserved.
 */
 
 import {ExpoWebGLRenderingContext} from 'expo-gl';
-import {EventListenerRegistry} from './CanvasEventHandler';
 
 export type NativeWebGLRenderingContext = ExpoWebGLRenderingContext & {
   drawingBufferWidth: number;
@@ -35,25 +34,18 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
   public width: number;
   public height: number;
   public style: Record<string, string>;
-  public addEventListener;
-  public removeEventListener;
+  public addEventListener = () => {};
+  public removeEventListener = () => {};
   public clientHeight: number;
-  public clientWidth: number;
 
   private context: NativeWebGLRenderingContext;
 
-  constructor(
-    context: NativeWebGLRenderingContext,
-    eventListenerRegistry: EventListenerRegistry,
-  ) {
+  constructor(context: NativeWebGLRenderingContext) {
     this.width = context.drawingBufferWidth;
     this.height = context.drawingBufferHeight;
     this.style = {};
     this.clientHeight = context.drawingBufferHeight;
-    this.clientWidth = context.drawingBufferWidth;
     this.context = context;
-    this.addEventListener = eventListenerRegistry.addEventListener;
-    this.removeEventListener = eventListenerRegistry.removeEventListener;
   }
 
   public getContext(glContext: 'webgl2') {
@@ -61,18 +53,5 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
       return this.context;
     }
     throw new Error(`Unsupported context: ${glContext}`);
-  }
-
-  public getBoundingClientRect() {
-    return {
-      x: 0,
-      y: 0,
-      left: 0,
-      top: 0,
-      right: this.width,
-      bottom: this.height,
-      width: this.width,
-      height: this.height,
-    };
   }
 }
