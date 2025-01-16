@@ -26,7 +26,89 @@ Infinite Reality Engine. All Rights Reserved.
 import { resolveAsync } from 'expo-asset-utils'
 import { Image, Platform } from 'react-native'
 import { GPUOffscreenCanvas } from 'react-native-wgpu'
-import THREE, { DataTexture } from 'three'
+import THREE, { DataTexture, LoadingManager, Texture } from 'three'
+import { Loader } from '../base/Loader'
+
+const iOSMaxResolution = 1024
+
+export class TextureLoader extends Loader<Texture> {
+  maxResolution: number | undefined
+  autoDetectBitmap: boolean | undefined
+
+  constructor(manager?: LoadingManager, autoDetectBitmap?: boolean, maxResolution?: number) {
+    super(manager)
+    if (maxResolution) this.maxResolution = maxResolution
+    else if (Platform.OS === 'ios') this.maxResolution = iOSMaxResolution
+    this.autoDetectBitmap = autoDetectBitmap
+  }
+
+  override async load(
+    asset: any,
+    onLoad?: (texture: THREE.Texture) => void,
+    onProgress?: (event: ProgressEvent) => void,
+    onError?: (event: unknown) => void
+  ) {
+    if (!asset) {
+      throw new Error('ExpoTHREE.TextureLoader.load(): Cannot parse a null asset')
+    }
+
+    const nativeAsset = await resolveAsync(asset)
+
+    if (!nativeAsset.width || !nativeAsset.height) {
+      const { width, height } = await new Promise<{
+        width: number
+        height: number
+      }>((res, rej) => {
+        Image.getSize(nativeAsset.localUri!, (width: number, height: number) => res({ width, height }), rej)
+      })
+      nativeAsset.width = width
+      nativeAsset.height = height
+    }
+
+    if (this.maxResolution && calculateResizingFactor(this.maxResolution, nativeAsset.height, nativeAsset.width) < 1) {
+      const data = await getScaledTextureData(nativeAsset.localUri!, this.maxResolution)
+
+      try {
+        // TODO: why is the texture the wrong color?
+        const texture = new DataTexture(new Uint8Array(data.data), data.width, data.height)
+        texture.needsUpdate = true
+        console.log('success', texture.id)
+
+        onLoad?.(texture)
+      } catch (err) {
+        console.error(err)
+        onError?.(err)
+      }
+    } else {
+      const texture = new THREE.Texture()
+      texture['isDataTexture'] = true // Forces passing to `gl.texImage2D(...)` verbatim
+      texture.image = {
+        data: nativeAsset,
+        width: nativeAsset.width,
+        height: nativeAsset.height
+      }
+      texture.needsUpdate = true
+
+      if (onLoad !== undefined) {
+        onLoad(texture)
+      }
+    }
+  }
+}
+
+const calculateResizingFactor = (maxResolution: number, originalHeight: number, originalWidth: number) => {
+  let resizingFactor = 1
+  if (originalWidth >= originalHeight) {
+    if (originalWidth > maxResolution) {
+      resizingFactor = maxResolution / originalWidth
+    }
+  } else {
+    if (originalHeight > maxResolution) {
+      resizingFactor = maxResolution / originalHeight
+    }
+  }
+  return resizingFactor
+}
 
 async function createTextureFromBase64(device: GPUDevice, imageURI: string) {
   const response = await fetch(imageURI)
@@ -50,7 +132,7 @@ async function createTextureFromBase64(device: GPUDevice, imageURI: string) {
   return texture
 }
 
-const getScaledTextureURI = async (imageURI: string, maxResolution: number) => {
+const getScaledTextureData = async (imageURI: string, maxResolution: number) => {
   const adapter = await navigator.gpu.requestAdapter()
   if (!adapter) {
     throw new Error('No adapter')
@@ -243,97 +325,4 @@ return textureSample(tex, texSampler, texCoord);
 
   const data = await canvas.getImageData()
   return data
-}
-
-const maxResolution = 1024
-
-export class TextureLoader extends THREE.TextureLoader {
-  load(
-    asset: any,
-    onLoad?: (texture: THREE.Texture) => void,
-    onProgress?: (event: ProgressEvent) => void,
-    onError?: (event: unknown) => void
-  ): THREE.Texture {
-    if (!asset) {
-      throw new Error('ExpoTHREE.TextureLoader.load(): Cannot parse a null asset')
-    }
-
-    const texture = new THREE.Texture()
-
-    const loader = new THREE.ImageLoader(this.manager)
-    loader.setCrossOrigin(this.crossOrigin)
-    loader.setPath(this.path)
-    ;(async () => {
-      const nativeAsset = await resolveAsync(asset)
-
-      function parseAsset(image) {
-        texture.image = image
-        texture.needsUpdate = true
-
-        if (onLoad !== undefined) {
-          onLoad(texture)
-        }
-      }
-
-      if (Platform.OS === 'web') {
-        loader.load(
-          nativeAsset.localUri!,
-          (image) => {
-            parseAsset(image)
-          },
-          onProgress,
-          onError
-        )
-      } else {
-        if (!nativeAsset.width || !nativeAsset.height) {
-          const { width, height } = await new Promise<{
-            width: number
-            height: number
-          }>((res, rej) => {
-            Image.getSize(nativeAsset.localUri!, (width: number, height: number) => res({ width, height }), rej)
-          })
-          nativeAsset.width = width
-          nativeAsset.height = height
-        }
-        texture['isDataTexture'] = true // Forces passing to `gl.texImage2D(...)` verbatim
-
-        const originalWidth = nativeAsset.width
-        const originalHeight = nativeAsset.height
-        let resizingFactor = 1
-        if (originalWidth >= originalHeight) {
-          if (originalWidth > maxResolution) {
-            resizingFactor = maxResolution / originalWidth
-          }
-        } else {
-          if (originalHeight > maxResolution) {
-            resizingFactor = maxResolution / originalHeight
-          }
-        }
-
-        if (resizingFactor < 1) {
-          const data = await getScaledTextureURI(nativeAsset.localUri!, maxResolution)
-
-          try {
-            // TODO: why is the texture the wrong color?
-            const texture = new DataTexture(new Uint8Array(data.data), data.width, data.height)
-            texture.needsUpdate = true
-            console.log('success', texture.id)
-
-            onLoad?.(texture)
-          } catch (err) {
-            console.error(err)
-            onError?.(err)
-          }
-        } else {
-          parseAsset({
-            data: nativeAsset,
-            width: nativeAsset.width,
-            height: nativeAsset.height
-          })
-        }
-      }
-    })()
-
-    return texture
-  }
 }
