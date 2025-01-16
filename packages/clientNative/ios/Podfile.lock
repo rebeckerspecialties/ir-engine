@@ -1433,6 +1433,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-wgpu (0.1.22):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - React-nativeconfig (0.76.2)
   - React-NativeModulesApple (0.76.2):
     - glog
@@ -1763,6 +1784,7 @@ DEPENDENCIES:
   - "react-native-draco (from `../../../node_modules/@callstack/react-native-draco`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
+  - react-native-wgpu (from `../../../node_modules/react-native-wgpu`)
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../../../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1912,6 +1934,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-get-random-values"
   react-native-quick-crypto:
     :path: "../../../node_modules/react-native-quick-crypto"
+  react-native-wgpu:
+    :path: "../../../node_modules/react-native-wgpu"
   React-nativeconfig:
     :path: "../../../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -2037,6 +2061,7 @@ SPEC CHECKSUMS:
   react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
+  react-native-wgpu: a57435e58b0b5b94f5809d13414b02ce52f6cd91
   React-nativeconfig: 7f8cd6cae21f8bb18c53b746c495e72795fc5cb0
   React-NativeModulesApple: 3210b7177c11145bb8e0d6f24aae102a221c4ddc
   React-perflogger: c8860eaab4fe60d628b27bf0086a372c429fc74f

@@ -30,7 +30,29 @@ import { GPUOffscreenCanvas } from 'react-native-wgpu'
 
 import THREE from 'three'
 
-const getScaledTextureURI = async () => {
+async function createTextureFromBase64(device: GPUDevice, imageURI: string) {
+  const response = await fetch(imageURI)
+  const blob = await response.blob()
+
+  // Create ImageBitmap
+  const imageBitmap = await createImageBitmap(blob)
+
+  // Create texture
+  const texture = device.createTexture({
+    size: [imageBitmap.width, imageBitmap.height, 1],
+    format: 'rgba8unorm',
+    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
+  })
+
+  device.queue.copyExternalImageToTexture({ source: imageBitmap }, { texture: texture }, [
+    imageBitmap.width,
+    imageBitmap.height
+  ])
+
+  return texture
+}
+
+const getScaledTextureURI = async (imageURI: string) => {
   const adapter = await navigator.gpu.requestAdapter()
   if (!adapter) {
     throw new Error('No adapter')
@@ -79,28 +101,6 @@ const getScaledTextureURI = async () => {
   vertexBuffer.unmap()
 
   // Load and create texture from base64
-  async function createTextureFromBase64(base64String) {
-    // Convert base64 to blob
-    const response = await fetch(base64String)
-    const blob = await response.blob()
-
-    // Create ImageBitmap
-    const imageBitmap = await createImageBitmap(blob)
-
-    // Create texture
-    const texture = device.createTexture({
-      size: [imageBitmap.width, imageBitmap.height, 1],
-      format: 'rgba8unorm',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
-    })
-
-    device.queue.copyExternalImageToTexture({ source: imageBitmap }, { texture: texture }, [
-      imageBitmap.width,
-      imageBitmap.height
-    ])
-
-    return texture
-  }
 
   // Create sampler
   const sampler = device.createSampler({
@@ -140,11 +140,7 @@ return textureSample(tex, texSampler, texCoord);
 `
   })
 
-  const image = await readFile('desk.exr', true)
-
-  // Example usage:
-  const base64Image = `data:image/png;base64,${image}`
-  const texture = await createTextureFromBase64(base64Image)
+  const texture = await createTextureFromBase64(device, imageURI)
 
   // Create bind group layout
   const bindGroupLayout = device.createBindGroupLayout({
@@ -247,13 +243,17 @@ return textureSample(tex, texSampler, texCoord);
   device.queue.submit([commandEncoder.finish()])
 
   const data = await canvas.getImageData()
-  console.log(data)
 
-  const dataString = String.fromCharCode.apply(null, data.data)
+  let dataString = ''
+  for (const c of data.data) {
+    dataString += String.fromCharCode(c)
+  }
   const encodedData = encode(dataString)
   const dataURI = 'data:image/png;base64,' + encodedData
   return dataURI
 }
+
+const maxResolution = 1024
 
 export class TextureLoader extends THREE.TextureLoader {
   load(
@@ -305,11 +305,34 @@ export class TextureLoader extends THREE.TextureLoader {
         }
         texture['isDataTexture'] = true // Forces passing to `gl.texImage2D(...)` verbatim
 
-        parseAsset({
-          data: nativeAsset,
-          width: nativeAsset.width,
-          height: nativeAsset.height
-        })
+        const originalWidth = nativeAsset.width
+        const originalHeight = nativeAsset.height
+        let resizingFactor = 1
+        if (originalWidth >= originalHeight) {
+          if (originalWidth > maxResolution) {
+            resizingFactor = maxResolution / originalWidth
+          }
+        } else {
+          if (originalHeight > maxResolution) {
+            resizingFactor = maxResolution / originalHeight
+          }
+        }
+
+        if (resizingFactor < 1) {
+          const scaledAssetURI = await getScaledTextureURI(nativeAsset.localUri!)
+          const scaledNativeAsset = await resolveAsync(scaledAssetURI)
+          parseAsset({
+            data: scaledNativeAsset,
+            width: scaledNativeAsset.width,
+            height: scaledNativeAsset.height
+          })
+        } else {
+          parseAsset({
+            data: nativeAsset,
+            width: nativeAsset.width,
+            height: nativeAsset.height
+          })
+        }
       }
     })()
 
