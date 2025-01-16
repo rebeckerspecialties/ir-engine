@@ -23,14 +23,26 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
+import { encode } from 'base-64'
 import { resolveAsync } from 'expo-asset-utils'
 import { Image, Platform } from 'react-native'
+import { GPUOffscreenCanvas } from 'react-native-wgpu'
 
 import THREE from 'three'
 
 const getScaledTextureURI = async () => {
+  const adapter = await navigator.gpu.requestAdapter()
+  if (!adapter) {
+    throw new Error('No adapter')
+  }
+  const device = await adapter.requestDevice()
+
   const canvas = new GPUOffscreenCanvas(1024, 1024)
   const context = canvas.getContext('webgpu')
+  if (!context) {
+    return
+  }
+
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
   context?.configure({
     device: device!,
@@ -236,6 +248,11 @@ return textureSample(tex, texSampler, texCoord);
 
   const data = await canvas.getImageData()
   console.log(data)
+
+  const dataString = String.fromCharCode.apply(null, data.data)
+  const encodedData = encode(dataString)
+  const dataURI = 'data:image/png;base64,' + encodedData
+  return dataURI
 }
 
 export class TextureLoader extends THREE.TextureLoader {
