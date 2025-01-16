@@ -48,6 +48,22 @@ export const initializeKTX2Loader = (loader: GLTFLoader) => {
   ktxLoader.setTranscoderPath(getState(DomainConfigState).publicDomain + '/loader_decoders/basis/')
   // FIXME: We are unable to spawn WebGLRenderer without Expo GL context. Is this required?
   if (global.RN$Bridgeless) {
+    ktxLoader.detectSupport({
+      isWebGPURenderer: false,
+      hasFeature: () => false,
+      extensions: new Map([
+        ['WEBGL_compressed_texture_astc', true],
+        ['WEBGL_compressed_texture_etc1', false],
+        ['WEBGL_compressed_texture_etc', true],
+        ['WEBGL_compressed_texture_s3tc', false],
+        ['EXT_texture_compression_bptc', false],
+        ['WEBGL_compressed_texture_pvrtc', true],
+        ['WEBKIT_WEBGL_compressed_texture_pvrtc', false]
+      ]),
+      capabilities: {
+        isWebGL2: true
+      }
+    })
     loader.setKTX2Loader(ktxLoader)
     return
   } else {
@@ -81,6 +97,7 @@ export const createGLTFLoader = (keepMaterials = false) => {
   //   MeshoptDecoder.useWorkers(2)
   // }
   // loader.setMeshoptDecoder(MeshoptDecoder)
+  console.error('skip setting mesh optimizer decoder')
 
   // TODO: Detect React Native better
   if (global.RN$Bridgeless) {

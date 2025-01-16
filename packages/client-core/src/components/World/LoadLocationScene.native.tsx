@@ -71,12 +71,13 @@ export const useLoadLocation = (props: { locationName: string }) => {
       !locationState.currentLocation.location.sceneId.value ||
       locationState.invalidLocation.value ||
       locationState.currentLocation.selfNotAuthorized.value ||
-      !scene
+      !locationState.currentLocation.location.sceneURL.value
     )
       return
-    const sceneURL = scene.url
-    return GLTFAssetState.loadScene(sceneURL, scene.id)
-  }, [locationState.currentLocation.location.sceneId, scene])
+    const sceneURL = locationState.currentLocation.location.sceneURL.value
+    const sceneID = locationState.currentLocation.location.sceneId.value
+    return GLTFAssetState.loadScene(sceneURL, sceneID)
+  }, [locationState.currentLocation.location.sceneId, locationState.currentLocation.location.sceneURL])
 }
 
 export const useLoadScene = (props: { projectName: string; sceneName: string }) => {
@@ -85,6 +86,12 @@ export const useLoadScene = (props: { projectName: string; sceneName: string }) 
     const key = `${props.projectName}/${props.sceneName}`
     const url = getState(DomainConfigState).cloudDomain + `/projects/${key}`
     getMutableState(LocationState).currentLocation.location.sceneId.set(key)
-    return GLTFAssetState.loadScene(url, key)
+    getMutableState(LocationState).currentLocation.location.sceneURL.set(url)
+    const unload = GLTFAssetState.loadScene(url, key)
+    return () => {
+      getMutableState(LocationState).currentLocation.location.sceneId.set('')
+      getMutableState(LocationState).currentLocation.location.sceneURL.set('')
+      unload()
+    }
   }, [])
 }

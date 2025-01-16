@@ -34,7 +34,6 @@ Infinite Reality Engine. All Rights Reserved.
 // createHyperStore()
 import React, {Suspense, lazy, useEffect} from 'react';
 import {SafeAreaView, View, Text} from 'react-native';
-import LocationRoutes from './src/pages/location/location';
 import waitForClientAuthenticated from '@ir-engine/client-core/src/util/wait-for-client-authenticated';
 import {pipeLogs} from '@ir-engine/common/src/logger';
 import {API} from '@ir-engine/common';

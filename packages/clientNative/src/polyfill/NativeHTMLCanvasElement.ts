@@ -54,4 +54,17 @@ export class NativeHTMLCanvasElement implements HTMLCanvasElement {
     }
     throw new Error(`Unsupported context: ${glContext}`);
   }
+
+  public getBoundingClientRect() {
+    return {
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: this.width,
+      bottom: this.height,
+      width: this.width,
+      height: this.height,
+    };
+  }
 }

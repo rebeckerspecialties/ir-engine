@@ -19,6 +19,7 @@
     "react": "18.2.0"
   },
   "dependencies": {
+    "@callstack/react-native-basis-universal": "^0.3.0",
     "@callstack/react-native-draco": "^0.3.0",
     "@expo/browser-polyfill": "^1.0.1",
     "@ir-engine/common": "^1.6.0",
@@ -28,16 +29,21 @@
     "@react-native-firebase/app": "^21.6.1",
     "@react-native-firebase/crashlytics": "^21.6.1",
     "@ungap/structured-clone": "^1.2.0",
+    "base-64": "^1.0.0",
     "expo": "^52.0.0",
+    "expo-asset": "^11.0.2",
+    "expo-asset-utils": "^3.0.0",
     "expo-gl": "^15.0.2",
     "expo-modules-core": "^2.0.4",
     "primus-client": "^7.3.4",
     "react": "18.2.0",
     "react-native": "0.76.2",
+    "react-native-blob-jsi-helper": "^0.3.1",
     "react-native-dotenv": "^3.4.11",
     "react-native-get-random-values": "^1.11.0",
     "react-native-nitro-modules": "^0.20.1",
     "react-native-quick-crypto": "^0.7.11",
+    "react-native-wgpu": "^0.1.22",
     "text-encoding-shim": "^1.0.5"
   },
   "devDependencies": {
@@ -52,6 +58,7 @@
     "@react-native/metro-config": "0.76.2",
     "@react-native/typescript-config": "0.76.2",
     "@rnx-kit/metro-config": "^2.0.1",
+    "@types/base-64": "^1.0.2",
     "@types/react": "18.2.0",
     "@types/react-test-renderer": "18.0.0",
     "babel-jest": "^29.6.3",
