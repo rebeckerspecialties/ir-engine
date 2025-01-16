@@ -55,7 +55,6 @@ import { avatarPath, userAvatarPath } from '@ir-engine/common/src/schema.type.mo
 import { AvatarNetworkAction } from '@ir-engine/engine/src/avatar/state/AvatarNetworkActions'
 import { ErrorComponent } from '@ir-engine/engine/src/scene/components/ErrorComponent'
 import { SceneSettingsComponent } from '@ir-engine/engine/src/scene/components/SceneSettingsComponent'
-import { NameComponent } from '@ir-engine/spatial/src/common/NameComponent'
 import { EngineState } from '@ir-engine/spatial/src/EngineState'
 import { useChildrenWithComponents } from '@ir-engine/spatial/src/transform/components/EntityTree'
 import { SearchParamState } from '../common/services/RouterService'
@@ -164,7 +163,6 @@ const reactor = () => {
   const locationSceneURL = useHookstate(getMutableState(LocationState).currentLocation.location.sceneURL).value
   const sceneEntity = useLoadedSceneEntity(locationSceneURL)
   const gltfLoaded = GLTFComponent.useSceneLoaded(sceneEntity)
-  const name = useOptionalComponent(sceneEntity, NameComponent)?.value
 
   if (!gltfLoaded || !userID) return null
 
