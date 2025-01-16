@@ -830,7 +830,6 @@ const useLoadTexture = (options: GLTFParserOptions, textureIndex?: number) => {
     loader.setRequestHeader(options.requestHeader)
   }
 
-  // TODO: why is options.json missing fields, e.g. uri?
   const texture = GLTFLoaderFunctions.useLoadTextureImage(options, textureIndex, sourceIndex, loader)
 
   return texture
@@ -902,7 +901,6 @@ const useLoadImageSource = (
 
   const sourceURI = useHookstate('')
   const result = useHookstate<Texture | null>(null)
-  // TODO: validate that this texture gets loaded by native texture loader
   const [loadedTexture, error] = useTexture(sourceURI.value, UndefinedEntity, () => {}, loader)
   let isObjectURL = false
 

@@ -131,15 +131,18 @@ export const FileExtToAssetExt = (fileExt: string): AssetExt | undefined => {
   return <AssetExt>fileExt
 }
 
+const getFileNameFromUrl = (path: string) => {
+  if (!global.RN$Bridgeless) {
+    const url = new URL(path)
+    return url.pathname.split('/').pop() as string
+  }
+  return path.split('/').pop() as string
+}
+
 const dataURLStart = 'data:image'
 export const FileToAssetExt = (file: string): AssetExt | undefined => {
   if (isURL(file)) {
-    if (!global.RN$Bridgeless) {
-      const url = new URL(file)
-      file = url.pathname.split('/').pop() as string
-    } else {
-      file = file.split('/').pop() as string
-    }
+    file = getFileNameFromUrl(file)
   }
   // Check if image data url
   else if (file.startsWith(dataURLStart)) {
@@ -159,12 +162,7 @@ export const FileToAssetType = (fileName: string): AssetType => {
   }
 
   if (isURL(fileName)) {
-    if (!global.RN$Bridgeless) {
-      const url = new URL(fileName)
-      fileName = url.pathname.split('/').pop() as string
-    } else {
-      fileName = fileName.split('/').pop() as string
-    }
+    fileName = getFileNameFromUrl(fileName)
   }
 
   const split = fileName.split('.')
