@@ -324,5 +324,14 @@ return textureSample(tex, texSampler, texCoord);
   device.queue.submit([commandEncoder.finish()])
 
   const data = await canvas.getImageData()
+  swizzleBrgaToRgba(data.data)
   return data
+}
+
+const swizzleBrgaToRgba = (data: number[]) => {
+  for (let i = 0; i < data.length; i += 4) {
+    const temp = data[i]
+    data[i] = data[i + 2]
+    data[i + 2] = temp
+  }
 }
