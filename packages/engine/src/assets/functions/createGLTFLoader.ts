@@ -97,6 +97,7 @@ export const createGLTFLoader = (keepMaterials = false) => {
   //   MeshoptDecoder.useWorkers(2)
   // }
   // loader.setMeshoptDecoder(MeshoptDecoder)
+  console.error('skip setting mesh optimizer decoder')
 
   // TODO: Detect React Native better
   if (global.RN$Bridgeless) {

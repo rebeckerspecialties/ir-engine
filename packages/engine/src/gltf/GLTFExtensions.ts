@@ -6,8 +6,8 @@ Version 1.0. (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 https://github.com/EtherealEngine/etherealengine/blob/dev/LICENSE.
 The License is based on the Mozilla Public License Version 1.1, but Sections 14
-and 15 have been added to cover use of software over a computer network and 
-provide for limited attribution for the Original Developer. In addition, 
+and 15 have been added to cover use of software over a computer network and
+provide for limited attribution for the Original Developer. In addition,
 Exhibit A has been modified to be consistent with Exhibit B.
 
 Software distributed under the License is distributed on an "AS IS" basis,
@@ -19,7 +19,7 @@ The Original Code is Ethereal Engine.
 The Original Developer is the Initial Developer. The Initial Developer of the
 Original Code is the Ethereal Engine team.
 
-All portions of the code written by the Ethereal Engine team are Copyright © 2021-2023 
+All portions of the code written by the Ethereal Engine team are Copyright © 2021-2023
 Ethereal Engine. All Rights Reserved.
 */
 
@@ -129,6 +129,7 @@ export const EXT_MESHOPT_COMPRESSION = {
           const decoder = getState(AssetLoaderState).gltfLoader.meshoptDecoder
           if (!decoder || !decoder.supported) {
             if (json.extensionsRequired && json.extensionsRequired.indexOf(EXTENSIONS.EXT_MESHOPT_COMPRESSION) >= 0) {
+              console.error('THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files')
               return reject('THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files')
             } else {
               // Assumes that the extension is optional and that fallback buffer data is present
