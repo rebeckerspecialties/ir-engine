@@ -23,12 +23,10 @@ All portions of the code written by the Infinite Reality Engine team are Copyrig
 Infinite Reality Engine. All Rights Reserved.
 */
 
-import { encode } from 'base-64'
 import { resolveAsync } from 'expo-asset-utils'
 import { Image, Platform } from 'react-native'
 import { GPUOffscreenCanvas } from 'react-native-wgpu'
-
-import THREE from 'three'
+import THREE, { DataTexture } from 'three'
 
 async function createTextureFromBase64(device: GPUDevice, imageURI: string) {
   const response = await fetch(imageURI)
@@ -52,20 +50,21 @@ async function createTextureFromBase64(device: GPUDevice, imageURI: string) {
   return texture
 }
 
-const getScaledTextureURI = async (imageURI: string) => {
+const getScaledTextureURI = async (imageURI: string, maxResolution: number) => {
   const adapter = await navigator.gpu.requestAdapter()
   if (!adapter) {
     throw new Error('No adapter')
   }
   const device = await adapter.requestDevice()
 
-  const canvas = new GPUOffscreenCanvas(1024, 1024)
+  const canvas = new GPUOffscreenCanvas(maxResolution, maxResolution)
   const context = canvas.getContext('webgpu')
   if (!context) {
-    return
+    throw new Error('Could not get webgpu context')
   }
 
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
+  console.log(presentationFormat)
   context?.configure({
     device: device!,
     format: presentationFormat,
@@ -243,14 +242,7 @@ return textureSample(tex, texSampler, texCoord);
   device.queue.submit([commandEncoder.finish()])
 
   const data = await canvas.getImageData()
-
-  let dataString = ''
-  for (const c of data.data) {
-    dataString += String.fromCharCode(c)
-  }
-  const encodedData = encode(dataString)
-  const dataURI = 'data:image/png;base64,' + encodedData
-  return dataURI
+  return data
 }
 
 const maxResolution = 1024
@@ -319,13 +311,19 @@ export class TextureLoader extends THREE.TextureLoader {
         }
 
         if (resizingFactor < 1) {
-          const scaledAssetURI = await getScaledTextureURI(nativeAsset.localUri!)
-          const scaledNativeAsset = await resolveAsync(scaledAssetURI)
-          parseAsset({
-            data: scaledNativeAsset,
-            width: scaledNativeAsset.width,
-            height: scaledNativeAsset.height
-          })
+          const data = await getScaledTextureURI(nativeAsset.localUri!, maxResolution)
+
+          try {
+            // TODO: why is the texture the wrong color?
+            const texture = new DataTexture(new Uint8Array(data.data), data.width, data.height)
+            texture.needsUpdate = true
+            console.log('success', texture.id)
+
+            onLoad?.(texture)
+          } catch (err) {
+            console.error(err)
+            onError?.(err)
+          }
         } else {
           parseAsset({
             data: nativeAsset,
