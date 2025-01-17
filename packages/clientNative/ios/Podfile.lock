@@ -1410,6 +1410,27 @@ PODS:
     - Yoga
   - react-native-get-random-values (1.11.0):
     - React-Core
+  - react-native-performance (5.1.2):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-quick-crypto (0.7.11):
     - DoubleConversion
     - glog
@@ -1783,6 +1804,7 @@ DEPENDENCIES:
   - react-native-blob-jsi-helper (from `../../../node_modules/react-native-blob-jsi-helper`)
   - "react-native-draco (from `../../../node_modules/@callstack/react-native-draco`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
+  - react-native-performance (from `../../../node_modules/react-native-performance`)
   - react-native-quick-crypto (from `../../../node_modules/react-native-quick-crypto`)
   - react-native-wgpu (from `../../../node_modules/react-native-wgpu`)
   - React-nativeconfig (from `../../../node_modules/react-native/ReactCommon`)
@@ -1932,6 +1954,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@callstack/react-native-draco"
   react-native-get-random-values:
     :path: "../../../node_modules/react-native-get-random-values"
+  react-native-performance:
+    :path: "../../../node_modules/react-native-performance"
   react-native-quick-crypto:
     :path: "../../../node_modules/react-native-quick-crypto"
   react-native-wgpu:
@@ -2060,6 +2084,7 @@ SPEC CHECKSUMS:
   react-native-blob-jsi-helper: bd7509e50b0f906044c53ad7ab767786054424c9
   react-native-draco: ca7c7ba9364c93a0a19f9197f66790d95abd852f
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
+  react-native-performance: cfdc166a3e515b6dab16809e38d36b22bb387119
   react-native-quick-crypto: 4921fde8af4321dd95df13963a80698c3a8fef34
   react-native-wgpu: a57435e58b0b5b94f5809d13414b02ce52f6cd91
   React-nativeconfig: 7f8cd6cae21f8bb18c53b746c495e72795fc5cb0
