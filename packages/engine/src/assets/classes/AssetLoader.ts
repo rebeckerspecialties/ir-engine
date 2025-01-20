@@ -101,6 +101,7 @@ export const isAbsolutePath = (path) => {
 }
 
 const getAbsolutePath = (url) => (isAbsolutePath(url) ? url : getState(DomainConfigState).publicDomain + url)
+const stripHttps = (url: string) => url.replace('https', 'http')
 
 const loadAsset = async <T>(
   url: string,
@@ -114,7 +115,7 @@ const loadAsset = async <T>(
     onError(new Error('URL is empty'))
     return
   }
-  url = getAbsolutePath(url)
+  url = stripHttps(getAbsolutePath(url))
 
   if (!loader) {
     const assetExt = getAssetType(url)
