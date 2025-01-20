@@ -212,7 +212,6 @@ const LERP_TIME = 1
 
 const computeCameraFollow = (cameraEntity: Entity, referenceEntity: Entity) => {
   const follow = getComponent(cameraEntity, FollowCameraComponent)
-  console.log(follow.mode)
   const followState = getMutableComponent(cameraEntity, FollowCameraComponent)
   const cameraTransform = getComponent(cameraEntity, TransformComponent)
   const targetTransform = getOptionalComponent(referenceEntity, TransformComponent)
@@ -398,11 +397,9 @@ const computeCameraFollow = (cameraEntity: Entity, referenceEntity: Entity) => {
   cameraTransform.rotation.slerpQuaternions(
     follow.originalRotation ?? cameraTransform.rotation,
     follow.targetRotation,
-    lerpVal
+    // TODO: fix lerp value
+    Math.max(lerpVal, 0.1)
   )
-
-  // TODO: why is this not updating?
-  console.log(cameraTransform.rotation)
 
   updateCameraTargetRotation(cameraEntity)
 }
